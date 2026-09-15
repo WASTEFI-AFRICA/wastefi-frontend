@@ -1,11 +1,11 @@
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Section } from "@/components/layout/Section";
-import { Card, CardContent } from "@/components/ui";
+import { WasteSubmissionForm } from "@/components/submission/WasteSubmissionForm";
 
 /**
- * Submit Waste Page (Placeholder)
- * Will be implemented in Phase 2: Collector Mobile App
+ * Submit Waste Page
+ * Submit waste collection with photos and details
  */
 
 export default function SubmitWastePage() {
@@ -19,13 +19,7 @@ export default function SubmitWastePage() {
       </Section>
 
       <Section spacing="sm">
-        <Card>
-          <CardContent className="p-8 text-center">
-            <p className="text-[var(--muted-foreground)]">
-              Waste submission form coming in Phase 2
-            </p>
-          </CardContent>
-        </Card>
+        <WasteSubmissionForm />
       </Section>
     </Container>
   );
