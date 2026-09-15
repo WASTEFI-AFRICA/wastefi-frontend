@@ -4,4 +4,4 @@
  */
 
 export { api, apiRequest, APIError } from "./client";
-export default from "./client";
+export { default } from "./client";
