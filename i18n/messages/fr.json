@@ -1,0 +1,66 @@
+{
+  "common": {
+    "appName": "WasteFi",
+    "welcome": "Bienvenue",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "back": "Retour",
+    "next": "Suivant",
+    "submit": "Soumettre",
+    "close": "Fermer"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "logout": "Déconnexion",
+    "email": "Email",
+    "phone": "Numéro de téléphone",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "forgotPassword": "Mot de passe oublié?",
+    "alreadyHaveAccount": "Vous avez déjà un compte?",
+    "dontHaveAccount": "Vous n'avez pas de compte?",
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "overview": "Vue d'ensemble",
+    "statistics": "Statistiques",
+    "recentActivity": "Activité récente"
+  },
+  "wallet": {
+    "title": "Portefeuille",
+    "balance": "Solde",
+    "totalEarnings": "Gains totaux",
+    "transactions": "Transactions",
+    "cashout": "Retirer",
+    "viewAll": "Voir toutes les transactions"
+  },
+  "submission": {
+    "title": "Soumettre des déchets",
+    "selectMaterial": "Sélectionner le type de matériau",
+    "enterWeight": "Entrer le poids",
+    "takePhoto": "Prendre une photo",
+    "estimatedValue": "Valeur estimée",
+    "submit": "Soumettre la collecte"
+  },
+  "profile": {
+    "title": "Profil",
+    "editProfile": "Modifier le profil",
+    "settings": "Paramètres",
+    "notifications": "Notifications",
+    "language": "Langue",
+    "privacy": "Confidentialité"
+  }
+}

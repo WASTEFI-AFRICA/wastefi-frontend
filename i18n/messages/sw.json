@@ -1,0 +1,66 @@
+{
+  "common": {
+    "appName": "WasteFi",
+    "welcome": "Karibu",
+    "loading": "Inapakia...",
+    "error": "Kosa",
+    "success": "Imefanikiwa",
+    "cancel": "Ghairi",
+    "confirm": "Thibitisha",
+    "save": "Hifadhi",
+    "delete": "Futa",
+    "edit": "Hariri",
+    "view": "Tazama",
+    "search": "Tafuta",
+    "filter": "Chuja",
+    "sort": "Panga",
+    "back": "Rudi",
+    "next": "Ifuatayo",
+    "submit": "Wasilisha",
+    "close": "Funga"
+  },
+  "auth": {
+    "login": "Ingia",
+    "register": "Jiandikishe",
+    "logout": "Toka",
+    "email": "Barua pepe",
+    "phone": "Nambari ya Simu",
+    "password": "Nywila",
+    "confirmPassword": "Thibitisha Nywila",
+    "forgotPassword": "Umesahau Nywila?",
+    "alreadyHaveAccount": "Una akaunti tayari?",
+    "dontHaveAccount": "Huna akaunti?",
+    "signIn": "Ingia",
+    "signUp": "Jiandikishe"
+  },
+  "dashboard": {
+    "title": "Dashibodi",
+    "overview": "Muhtasari",
+    "statistics": "Takwimu",
+    "recentActivity": "Shughuli za Hivi Karibuni"
+  },
+  "wallet": {
+    "title": "Mkoba",
+    "balance": "Salio",
+    "totalEarnings": "Mapato Yote",
+    "transactions": "Miamala",
+    "cashout": "Ondoa Pesa",
+    "viewAll": "Tazama Miamala Yote"
+  },
+  "submission": {
+    "title": "Wasilisha Taka",
+    "selectMaterial": "Chagua Aina ya Nyenzo",
+    "enterWeight": "Weka Uzito",
+    "takePhoto": "Piga Picha",
+    "estimatedValue": "Thamani Inayokadiriwa",
+    "submit": "Wasilisha Ukusanyaji"
+  },
+  "profile": {
+    "title": "Wasifu",
+    "editProfile": "Hariri Wasifu",
+    "settings": "Mipangilio",
+    "notifications": "Arifa",
+    "language": "Lugha",
+    "privacy": "Faragha"
+  }
+}

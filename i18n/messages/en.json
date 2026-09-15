@@ -1,0 +1,66 @@
+{
+  "common": {
+    "appName": "WasteFi",
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "close": "Close"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email",
+    "phone": "Phone Number",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "signIn": "Sign In",
+    "signUp": "Sign Up"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "overview": "Overview",
+    "statistics": "Statistics",
+    "recentActivity": "Recent Activity"
+  },
+  "wallet": {
+    "title": "Wallet",
+    "balance": "Balance",
+    "totalEarnings": "Total Earnings",
+    "transactions": "Transactions",
+    "cashout": "Cash Out",
+    "viewAll": "View All Transactions"
+  },
+  "submission": {
+    "title": "Submit Waste",
+    "selectMaterial": "Select Material Type",
+    "enterWeight": "Enter Weight",
+    "takePhoto": "Take Photo",
+    "estimatedValue": "Estimated Value",
+    "submit": "Submit Collection"
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "language": "Language",
+    "privacy": "Privacy"
+  }
+}
