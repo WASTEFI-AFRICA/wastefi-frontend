@@ -17,16 +17,16 @@ interface MaterialOption {
 }
 
 const materials: MaterialOption[] = [
-  { type: "PET_PLASTIC", label: "PET Plastic", rate: 1.0, emoji: "♻️" },
-  { type: "HDPE_PLASTIC", label: "HDPE Plastic", rate: 0.9, emoji: "🥤" },
-  { type: "MIXED_PLASTIC", label: "Mixed Plastic", rate: 0.7, emoji: "🗑️" },
-  { type: "CARDBOARD", label: "Cardboard", rate: 0.5, emoji: "📦" },
-  { type: "PAPER", label: "Paper", rate: 0.4, emoji: "📄" },
-  { type: "ALUMINUM", label: "Aluminum", rate: 1.5, emoji: "🥫" },
-  { type: "STEEL", label: "Steel", rate: 0.8, emoji: "🔩" },
-  { type: "GLASS", label: "Glass", rate: 0.3, emoji: "🍾" },
-  { type: "E_WASTE", label: "E-Waste", rate: 2.0, emoji: "💻" },
-  { type: "OTHER", label: "Other", rate: 0.5, emoji: "🔄" },
+  { type: "plastic", label: "PET Plastic", rate: 1.0, emoji: "♻️" },
+  { type: "plastic", label: "HDPE Plastic", rate: 0.9, emoji: "🥤" },
+  { type: "plastic", label: "Mixed Plastic", rate: 0.7, emoji: "🗑️" },
+  { type: "cardboard", label: "Cardboard", rate: 0.5, emoji: "📦" },
+  { type: "paper", label: "Paper", rate: 0.4, emoji: "📄" },
+  { type: "metal", label: "Aluminum", rate: 1.5, emoji: "🥫" },
+  { type: "metal", label: "Steel", rate: 0.8, emoji: "🔩" },
+  { type: "glass", label: "Glass", rate: 0.3, emoji: "🍾" },
+  { type: "e-waste", label: "E-Waste", rate: 2.0, emoji: "💻" },
+  { type: "mixed", label: "Other", rate: 0.5, emoji: "🔄" },
 ];
 
 interface MaterialTypeSelectorProps {

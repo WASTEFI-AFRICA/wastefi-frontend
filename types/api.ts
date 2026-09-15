@@ -1,169 +1,159 @@
 /**
- * WasteFi API Type Definitions
- * Shared types for API requests and responses
+ * API Types
+ * Type definitions for API requests and responses
  */
 
-// ============================================================================
-// User & Authentication
-// ============================================================================
+export type UserRole = "collector" | "collection_point" | "admin";
+
+export type MaterialType =
+  | "plastic"
+  | "paper"
+  | "metal"
+  | "glass"
+  | "e-waste"
+  | "textiles"
+  | "organic"
+  | "cardboard"
+  | "batteries"
+  | "mixed";
+
+export type TransactionType =
+  | "collection"
+  | "cashout"
+  | "bonus"
+  | "penalty"
+  | "refund";
+
+export type CollectionStatus =
+  | "pending"
+  | "verified"
+  | "rejected"
+  | "paid";
 
 export interface User {
   id: string;
-  name: string;
-  email: string;
   phone: string;
-  role: "collector" | "collection_point" | "admin";
-  kycStatus: "pending" | "approved" | "rejected";
-  walletAddress?: string;
+  name: string;
+  email?: string;
+  role: UserRole;
   createdAt: string;
-  updatedAt: string;
+  lastActive?: string;
 }
 
 export interface AuthResponse {
-  token: string;
   user: User;
+  token: string;
+  refreshToken: string;
 }
 
-export interface LoginRequest {
-  phone: string;
-  password?: string;
-  otp?: string;
+export interface WalletBalance {
+  usd: number;
+  xlm: number;
+  lastUpdated: string;
 }
-
-export interface RegisterRequest {
-  name: string;
-  phone: string;
-  email?: string;
-  role: "collector" | "collection_point";
-}
-
-// ============================================================================
-// Waste Collection
-// ============================================================================
-
-export interface WasteSubmission {
-  id: string;
-  collectorId: string;
-  collectionPointId: string;
-  materialType: MaterialType;
-  weight: number; // in kg
-  photos: string[];
-  status: "pending" | "approved" | "rejected";
-  value: number; // in USD
-  createdAt: string;
-  verifiedAt?: string;
-  verifiedBy?: string;
-  rejectionReason?: string;
-}
-
-export interface CreateWasteSubmissionRequest {
-  collectionPointId: string;
-  materialType: MaterialType;
-  weight: number;
-  photos: string[]; // Base64 or URLs
-}
-
-export type MaterialType =
-  | "PET_PLASTIC"
-  | "HDPE_PLASTIC"
-  | "MIXED_PLASTIC"
-  | "CARDBOARD"
-  | "PAPER"
-  | "ALUMINUM"
-  | "STEEL"
-  | "GLASS"
-  | "E_WASTE"
-  | "OTHER";
-
-// ============================================================================
-// Collection Points
-// ============================================================================
-
-export interface CollectionPoint {
-  id: string;
-  name: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  operatingHours: string;
-  acceptedMaterials: MaterialType[];
-  contactPhone: string;
-  status: "active" | "inactive";
-  qrCode: string;
-  createdAt: string;
-}
-
-// ============================================================================
-// Wallet & Transactions
-// ============================================================================
 
 export interface Wallet {
   id: string;
   userId: string;
-  balance: number; // in USD
+  balance: number;
+  currency: "usd" | "xlm";
   stellarAddress?: string;
-  pendingBalance: number;
-  totalEarned: number;
+  createdAt: string;
   updatedAt: string;
 }
 
 export interface Transaction {
   id: string;
   userId: string;
-  type: "credit" | "debit";
+  type: TransactionType;
   amount: number;
+  currency: "usd" | "xlm";
   status: "pending" | "completed" | "failed";
-  reference: string;
   description: string;
-  submissionId?: string;
+  metadata?: Record<string, unknown>;
   createdAt: string;
-  completedAt?: string;
+}
+
+export interface CollectionPoint {
+  id: string;
+  name: string;
+  address: string;
+  location: {
+    lat: number;
+    lng: number;
+  };
+  acceptedMaterials: MaterialType[];
+  operatingHours: {
+    open: string;
+    close: string;
+    days: string[];
+  };
+  contact?: {
+    phone?: string;
+    email?: string;
+  };
+  rating?: number;
+  totalCollections?: number;
+  verified: boolean;
+  createdAt: string;
+}
+
+export interface WasteSubmission {
+  id: string;
+  collectorId: string;
+  collectionPointId: string;
+  materialType: MaterialType;
+  weight: number;
+  photos: string[];
+  status: CollectionStatus;
+  location?: {
+    lat: number;
+    lng: number;
+  };
+  estimatedValue?: number;
+  actualValue?: number;
+  verifiedAt?: string;
+  createdAt: string;
+}
+
+export interface ApiError {
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
+}
+
+// Request types
+export interface LoginRequest {
+  phone: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  phone: string;
+  name: string;
+  password: string;
+  termsAccepted: boolean;
+}
+
+export interface VerifyPhoneRequest {
+  phone: string;
+  code: string;
+}
+
+export interface SubmitWasteRequest {
+  collectionPointId: string;
+  materialType: MaterialType;
+  weight: number;
+  photos: string[];
+  location?: {
+    lat: number;
+    lng: number;
+  };
 }
 
 export interface CashoutRequest {
   amount: number;
-  method: "mobile_money" | "stellar" | "bank";
-  destination: string; // Phone number, Stellar address, or bank details
-}
-
-// ============================================================================
-// Analytics & Impact
-// ============================================================================
-
-export interface ImpactStats {
-  userId: string;
-  totalWeight: number; // kg
-  totalValue: number; // USD
-  co2Reduced: number; // kg
-  plasticCollected: number; // kg
-  treesEquivalent: number;
-  collectionsCount: number;
-  period: "week" | "month" | "year" | "all_time";
-}
-
-// ============================================================================
-// API Response Wrappers
-// ============================================================================
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message?: string;
-}
-
-export interface ApiError {
-  success: false;
-  error: string;
-  message: string;
-  statusCode: number;
+  currency: "usd" | "xlm";
+  method: "mobile_money" | "stellar" | "bank_transfer";
+  destination: string;
 }

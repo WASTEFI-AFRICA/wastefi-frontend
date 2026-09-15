@@ -2,13 +2,14 @@
 
 import { Button } from "@/components/ui";
 import { Filter } from "lucide-react";
+import type { TransactionType } from "@/types/api";
 
 /**
  * Transaction Filter Component
  * Filter transactions by type and status
  */
 
-export type TransactionFilterType = "all" | "credit" | "debit";
+export type TransactionFilterType = "all" | TransactionType;
 
 interface TransactionFilterProps {
   activeFilter: TransactionFilterType;
@@ -21,8 +22,9 @@ export function TransactionFilter({
 }: TransactionFilterProps) {
   const filters: { value: TransactionFilterType; label: string }[] = [
     { value: "all", label: "All" },
-    { value: "credit", label: "Received" },
-    { value: "debit", label: "Sent" },
+    { value: "collection", label: "Collections" },
+    { value: "cashout", label: "Cashouts" },
+    { value: "bonus", label: "Bonuses" },
   ];
 
   return (

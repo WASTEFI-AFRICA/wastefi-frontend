@@ -74,7 +74,7 @@ export function TransactionList({ transactions, isLoading }: TransactionListProp
 }
 
 function TransactionItem({ transaction }: { transaction: Transaction }) {
-  const isCredit = transaction.type === "credit";
+  const isCredit = transaction.type === "collection" || transaction.type === "bonus" || transaction.type === "refund";
   const isPending = transaction.status === "pending";
   const isFailed = transaction.status === "failed";
 
@@ -102,14 +102,6 @@ function TransactionItem({ transaction }: { transaction: Transaction }) {
           <p className="text-sm text-[var(--muted-foreground)]">
             {format(new Date(transaction.createdAt), "MMM dd, yyyy • HH:mm")}
           </p>
-          {transaction.reference && (
-            <>
-              <span className="text-[var(--muted-foreground)]">•</span>
-              <p className="text-xs text-[var(--muted-foreground)] truncate">
-                {transaction.reference}
-              </p>
-            </>
-          )}
         </div>
       </div>
 
