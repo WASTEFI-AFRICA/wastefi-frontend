@@ -1,274 +1,254 @@
 # WasteFi Frontend
 
-**Tagline:** "Financial Inclusion Through Waste Collection - Powered by Open Material Standards"
+A Progressive Web Application for waste collection and financial inclusion in emerging markets.
 
-## Overview
+## 🌍 Overview
 
-WasteFi is a mobile-first Progressive Web Application (PWA) designed to enable waste collectors in emerging markets to earn income through waste collection, integrated with Stellar blockchain payments and mobile money systems.
+WasteFi enables waste collectors to earn income through waste collection, integrated with Stellar blockchain payments and mobile money systems. Built with Next.js 16, TypeScript, and TailwindCSS.
 
-## 🎉 Phase 1 Complete!
+**Key Features:**
+- 📱 Progressive Web App (PWA) - installable on mobile devices
+- 🌐 Offline-first architecture with IndexedDB
+- 🌍 Multi-language support (English, Swahili, French)
+- 🎨 Mobile-first responsive design
+- 🔒 Secure authentication and payment processing
+- 📊 Real-time analytics and monitoring
+- 🎮 Gamification with achievements and leaderboards
 
-**Setup phase completed with 5 commits:**
-- ✅ Next.js + TypeScript + PWA configuration
-- ✅ Design system with component library
-- ✅ State management (Zustand + React Query)
-- ✅ Offline-first architecture (IndexedDB + Service Worker)
-- ✅ Responsive layout with mobile-first navigation
-
-See [PROGRESS.md](./PROGRESS.md) for detailed completion status.
-
-## Tech Stack
-
-### Core
-- **Framework:** Next.js 16 (App Router)
-- **Language:** TypeScript 5
-- **Styling:** TailwindCSS 4
-- **PWA:** next-pwa
-
-### State Management
-- **Global State:** Zustand (lightweight, performant)
-- **Server State:** TanStack React Query (caching, sync)
-- **Offline Storage:** IndexedDB via idb library
-
-### UI & Components
-- **Component System:** Custom component library
-- **Icons:** Lucide React
-- **Variants:** class-variance-authority
-- **Utilities:** clsx, tailwind-merge
-
-### API & Data
-- **HTTP Client:** Axios with interceptors
-- **Type Safety:** Comprehensive TypeScript definitions
-
-## Project Structure
-
-```
-wastefi-frontend/
-├── app/                      # Next.js App Router pages
-│   ├── (auth)/              # Authentication routes
-│   ├── (collector)/         # Collector-specific routes
-│   ├── (collection-point)/  # Collection point routes
-│   ├── (admin)/             # Admin routes
-│   └── layout.tsx           # Root layout
-├── components/              # Reusable React components
-│   ├── ui/                  # UI components (Button, Card, etc.)
-│   ├── navigation/          # Navigation components
-│   ├── layout/              # Layout components
-│   ├── offline/             # Offline indicators
-│   └── providers/           # Context providers
-├── lib/                     # Utilities and helpers
-│   ├── api/                 # API client configuration
-│   ├── db/                  # IndexedDB operations
-│   ├── sync/                # Sync manager
-│   ├── hooks/               # Custom React hooks
-│   └── utils.ts             # Utility functions
-├── store/                   # Zustand stores
-│   ├── authStore.ts         # Authentication state
-│   ├── walletStore.ts       # Wallet state
-│   └── uiStore.ts           # UI state (modals, toasts)
-├── types/                   # TypeScript type definitions
-│   └── api.ts               # API types
-├── public/                  # Static assets
-│   ├── icons/               # PWA icons
-│   └── manifest.json        # PWA manifest
-└── *.md                     # Documentation files
-```
-
-## Documentation
-
-Comprehensive guides for all major features:
-
-1. **[PROGRESS.md](./PROGRESS.md)** - Development progress and status
-2. **[DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)** - Design tokens and component usage
-3. **[STATE_MANAGEMENT.md](./STATE_MANAGEMENT.md)** - State architecture and patterns
-4. **[OFFLINE_ARCHITECTURE.md](./OFFLINE_ARCHITECTURE.md)** - Offline-first implementation
-5. **[RESPONSIVE_LAYOUT.md](./RESPONSIVE_LAYOUT.md)** - Responsive design patterns
-
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
 - Node.js 18+ 
 - npm or yarn
+- Git
 
 ### Installation
 
 ```bash
+# Clone the repository
+git clone <repository-url>
+cd wastefi-frontend
+
 # Install dependencies
 npm install
 
-# Copy environment variables
+# Create environment file
 cp .env.example .env.local
 
-# Configure your API URL in .env.local
-NEXT_PUBLIC_API_URL=http://localhost:3001/api
-```
-
-### Development
-
-```bash
+# Run development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-### Build
+## 📦 Tech Stack
 
-```bash
-npm run build
+### Core
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript 5
+- **Styling**: TailwindCSS 4
+- **PWA**: next-pwa with Service Workers
+
+### State & Data
+- **Global State**: Zustand
+- **Server State**: TanStack React Query
+- **Offline Storage**: IndexedDB (idb)
+- **HTTP Client**: Axios
+
+### UI & UX
+- **Components**: Custom component library
+- **Icons**: Lucide React
+- **Forms**: React Hook Form + Zod
+- **Maps**: Leaflet + react-leaflet
+- **Camera**: react-webcam
+- **i18n**: next-intl
+
+## 📁 Project Structure
+
+```
+wastefi-frontend/
+├── app/                    # Next.js App Router pages
+│   ├── (auth)/            # Authentication routes
+│   ├── (collector)/       # Collector dashboard
+│   ├── (collection-point)/# Collection point dashboard
+│   └── (admin)/           # Admin dashboard
+├── components/            # React components
+│   ├── ui/               # Base UI components
+│   ├── navigation/       # Navigation components
+│   ├── wallet/           # Wallet components
+│   ├── submission/       # Waste submission
+│   └── ...               # Feature-specific components
+├── lib/                   # Utilities and helpers
+│   ├── api/              # API client
+│   ├── db/               # IndexedDB operations
+│   ├── sync/             # Sync manager
+│   └── hooks/            # Custom React hooks
+├── store/                 # Zustand stores
+├── types/                 # TypeScript definitions
+├── i18n/                  # Translations
+└── public/                # Static assets
 ```
 
-### Production
+## 🛠️ Available Scripts
 
 ```bash
-npm start
+# Development
+npm run dev              # Start dev server (webpack mode)
+npm run build            # Build for production
+npm start                # Start production server
+
+# Quality
+npm run lint             # Run ESLint
+npm run type-check       # Check TypeScript types
+
+# Performance
+npm run build:analyze    # Analyze bundle size
+npm run lighthouse       # Run Lighthouse audit
 ```
 
-## Features Implemented
+## 🌐 User Roles
 
-### ✅ Core Infrastructure
-- Progressive Web App (PWA) with offline support
-- Service Worker with intelligent caching
-- IndexedDB for offline data persistence
-- Automatic background synchronization
+### 👤 Collectors
+- Submit waste with photos and material selection
+- Track earnings and wallet balance
+- Find nearby collection points
+- View collection history
+- Earn achievements and compete on leaderboards
+- Cash out via mobile money, bank, or Stellar
 
-### ✅ Design System
-- Comprehensive color palette (brand, semantic, neutrals)
-- Typography scale (6 levels)
-- Component library (Button, Card, Input, Badge)
-- Dark mode support
-- Responsive utilities
+### 🏪 Collection Points
+- Verify and approve waste submissions
+- Manage inventory and stock levels
+- Process payments to collectors
+- View analytics and performance metrics
+- Track top collectors
 
-### ✅ Navigation
-- Bottom navigation for mobile (4 tabs)
-- Persistent sidebar for desktop
-- Drawer sidebar for mobile
-- Top bar with sync status
-- Active route highlighting
+### 👨‍💼 Administrators
+- Monitor system health
+- Manage users and KYC verification
+- Detect and investigate fraud
+- View platform-wide analytics
 
-### ✅ State Management
-- Authentication state (Zustand)
-- Wallet state (Zustand)
-- UI state for modals/toasts (Zustand)
-- Server state caching (React Query)
-- Offline queue management
+## 🌍 Internationalization
 
-### ✅ Offline Support
-- Submissions saved offline
-- Automatic sync when online
-- Retry logic (max 3 attempts)
-- Sync queue with priority
-- Online/offline indicators
+The app supports 3 languages:
 
-### ✅ Layouts & Routing
-- App Router with route groups
-- Auth layout (centered)
-- Collector layout (with navigation)
-- Collection point layout
-- Admin layout
-- Responsive containers
+- 🇬🇧 **English** (en) - Default
+- 🇰🇪 **Kiswahili** (sw) - East Africa
+- 🇫🇷 **Français** (fr) - West/Central Africa
 
-## Development Roadmap
+Users can switch languages in the settings page.
 
-### Phase 1: Setup ✅ (Commits 1-5) - COMPLETED
-- [x] Initialize Next.js with TypeScript and PWA
-- [x] Setup TailwindCSS and component library
-- [x] Configure routing and state management
-- [x] Add offline-first architecture
-- [x] Implement responsive layout
+## 📴 Offline Support
 
-### Phase 2: Collector Mobile App (Commits 6-12)
-- [ ] Onboarding flow and registration
-- [ ] Wallet dashboard
-- [ ] Waste submission form with camera
-- [ ] Collection point finder with map
-- [ ] QR code scanner
-- [ ] Mobile money cashout
-- [ ] Offline sync enhancements
+WasteFi works offline with:
+- IndexedDB for local data storage
+- Service Worker for asset caching
+- Automatic background sync
+- Offline indicators and queue management
 
-### Phase 3: Collection Point Dashboard (Commits 13-17)
-- [ ] Collection point admin login
-- [ ] Waste verification interface
-- [ ] Inventory management
-- [ ] Payment processing
-- [ ] Analytics dashboard
+Data syncs automatically when connection is restored.
 
-### Phase 4: Admin & Monitoring (Commits 18-22)
-- [ ] Super admin dashboard
-- [ ] User management and KYC
-- [ ] Fraud detection
-- [ ] Analytics and impact visualization
-- [ ] RecycleGraph material passport viewer
+## 🔒 Environment Variables
 
-### Phase 5: Polish & Optimization (Commits 23-25)
-- [ ] Internationalization (i18n)
-- [ ] Performance optimization
-- [ ] E2E testing with Playwright
-
-## PWA Features
-
-- **Offline-first architecture** with service workers
-- **Installable** on mobile devices and desktop
-- **Fast loading** with optimized assets and caching
-- **Responsive design** for all screen sizes
-- **Background sync** for offline submissions
-- **Push notifications** (future enhancement)
-
-## Environment Variables
-
-Create `.env.local` based on `.env.example`:
+Create a `.env.local` file:
 
 ```bash
 # API Configuration
-NEXT_PUBLIC_API_URL=http://localhost:3001/api
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_API_VERSION=v1
 
 # Feature Flags
 NEXT_PUBLIC_ENABLE_OFFLINE_MODE=true
-NEXT_PUBLIC_ENABLE_MOCK_DATA=false
 
-# App Configuration
-NEXT_PUBLIC_APP_NAME=WasteFi
-NEXT_PUBLIC_APP_VERSION=0.1.0
+# Optional: Analytics, Maps, Payments
+# See .env.example for full list
 ```
 
-## Scripts
+See `.env.example` for all available variables.
+
+## 📊 Performance
+
+Target metrics:
+- Lighthouse Score: >90
+- First Contentful Paint: <1.5s
+- Time to Interactive: <3.5s
+- Bundle Size: Optimized with code splitting
+- All routes: Static generation
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 ```bash
-# Development server (webpack mode for PWA)
-npm run dev
+# Install Vercel CLI
+npm i -g vercel
 
-# Production build
-npm run build
-
-# Start production server
-npm start
-
-# Run linter
-npm run lint
+# Deploy
+vercel
 ```
 
-## Browser Support
+### Docker
 
-- Chrome/Edge 90+
-- Firefox 88+
-- Safari 14+
-- Mobile browsers (iOS Safari, Chrome Android)
+```bash
+# Build image
+docker build -t wastefi-frontend .
 
-## Performance
+# Run container
+docker run -p 3000:3000 wastefi-frontend
+```
 
-- **Lighthouse Score Target:** 90+
-- **First Contentful Paint:** < 1.5s
-- **Time to Interactive:** < 3.5s
-- **Optimized for:** Low-bandwidth environments
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
 
-## Contributing
+## 📚 Documentation
 
-This is a private project. For questions or issues, contact the development team.
+- [Design System](./DESIGN_SYSTEM.md) - UI components and tokens
+- [State Management](./STATE_MANAGEMENT.md) - Zustand stores and React Query
+- [Offline Architecture](./OFFLINE_ARCHITECTURE.md) - IndexedDB and sync
+- [Responsive Layout](./RESPONSIVE_LAYOUT.md) - Mobile-first patterns
+- [Internationalization](./INTERNATIONALIZATION.md) - i18n setup
+- [Performance](./PERFORMANCE.md) - Optimization techniques
+- [Deployment](./DEPLOYMENT.md) - Production deployment guide
+- [Project Summary](./PROJECT_SUMMARY.md) - Complete project overview
 
-## License
+## 🧪 Testing
 
-TBD
+```bash
+# Type checking
+npm run type-check
 
-## Acknowledgments
+# Linting
+npm run lint
 
-Built for emerging market waste collectors with love ♻️
+# Build verification
+npm run build
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+To Be Determined
+
+## 🙏 Acknowledgments
+
+Built to serve waste collectors in emerging markets and contribute to a circular economy.
+
+## 📞 Support
+
+For support, email support@wastefi.com or open an issue on GitHub.
+
+---
+
+**Status**: Production Ready 🚀  
+**Version**: 1.0.0  
+**Last Updated**: February 2024
