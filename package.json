@@ -5,8 +5,11 @@
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
+    "build:analyze": "ANALYZE=true next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "type-check": "tsc --noEmit",
+    "lighthouse": "lighthouse http://localhost:3000 --view"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
