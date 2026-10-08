@@ -21,13 +21,13 @@ import { useAuthStore } from "@/store/authStore";
 
 function MyComponent() {
   const { user, isAuthenticated, setAuth, logout } = useAuthStore();
-  
+
   // Login
   setAuth(userData, token);
-  
+
   // Logout
   logout();
-  
+
   // Check auth status
   if (!isAuthenticated) {
     // Redirect to login
@@ -56,7 +56,7 @@ import { useWalletStore } from "@/store/walletStore";
 
 function WalletComponent() {
   const { wallet, transactions, setWallet, addTransaction } = useWalletStore();
-  
+
   return (
     <div>
       <p>Balance: ${wallet?.balance}</p>
@@ -88,13 +88,13 @@ import { useUIStore } from "@/store/uiStore";
 
 function MyComponent() {
   const { isOnline, addToast, openModal } = useUIStore();
-  
+
   // Show toast
   addToast("Success!", "success");
-  
+
   // Open modal
   openModal("confirmDialog");
-  
+
   // Check connectivity
   if (!isOnline) {
     // Show offline message
@@ -193,29 +193,29 @@ import type { Wallet } from "@/types/api";
 
 function WalletComponent() {
   const queryClient = useQueryClient();
-  
+
   // Fetch wallet data
   const { data: wallet, isLoading, error } = useQuery({
     queryKey: ["wallet"],
     queryFn: () => api.get<Wallet>("/wallet"),
   });
-  
+
   // Cashout mutation
   const cashoutMutation = useMutation({
-    mutationFn: (amount: number) => 
+    mutationFn: (amount: number) =>
       api.post("/wallet/cashout", { amount }),
     onSuccess: () => {
       // Invalidate and refetch wallet
       queryClient.invalidateQueries({ queryKey: ["wallet"] });
     },
   });
-  
+
   return (
     <div>
       {isLoading && <p>Loading...</p>}
       {error && <p>Error: {error.message}</p>}
       {wallet && <p>Balance: ${wallet.balance}</p>}
-      
+
       <button onClick={() => cashoutMutation.mutate(100)}>
         Cash Out $100
       </button>
@@ -287,13 +287,13 @@ import { useRouter } from "next/navigation";
 
 function MyComponent() {
   const router = useRouter();
-  
+
   // Navigate to dashboard
   router.push("/dashboard");
-  
+
   // Navigate with replace (no history)
   router.replace("/login");
-  
+
   // Go back
   router.back();
 }

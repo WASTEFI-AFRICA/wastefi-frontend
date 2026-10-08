@@ -37,11 +37,11 @@ export function PointsPage() {
 
 ### Implemented Dynamic Imports
 
-- ✅ Map components (Leaflet is large)
-- ✅ Chart libraries
-- ✅ Camera/webcam components
-- ✅ QR code scanner
-- ✅ Heavy modals
+- Map components (Leaflet is large)
+- Chart libraries
+- Camera/webcam components
+- QR code scanner
+- Heavy modals
 
 ## Image Optimization
 
@@ -106,19 +106,19 @@ Run: `ANALYZE=true npm run build`
 Import only what you need:
 
 ```tsx
-// ❌ Bad - imports entire library
+// Not done Bad - imports entire library
 import _ from 'lodash'
 
-// ✅ Good - imports only needed function
+// Done Good - imports only needed function
 import debounce from 'lodash/debounce'
 ```
 
 ### Dependencies Audit
 
 Current optimizations:
-- ✅ `lucide-react` (tree-shakeable icons)
-- ✅ `date-fns` (modular date library)
-- ✅ TailwindCSS v4 (optimized CSS)
+- `lucide-react` (tree-shakeable icons)
+- `date-fns` (modular date library)
+- TailwindCSS v4 (optimized CSS)
 
 ### Remove Unused Dependencies
 
@@ -302,10 +302,10 @@ npm run build -- --profile
 ### 1. Avoid Inline Functions in JSX
 
 ```tsx
-// ❌ Bad - creates new function on every render
+// Not done Bad - creates new function on every render
 <Button onClick={() => handleClick(id)}>Click</Button>
 
-// ✅ Good - use useCallback
+// Done Good - use useCallback
 const handleButtonClick = useCallback(() => handleClick(id), [id])
 <Button onClick={handleButtonClick}>Click</Button>
 ```

@@ -98,7 +98,7 @@ import { useTranslations } from 'next-intl'
 
 export function MyComponent() {
   const t = useTranslations('newFeature')
-  
+
   return <h1>{t('title')}</h1>
 }
 ```
@@ -113,10 +113,10 @@ To add support for a new language:
 
 ```tsx
 const LANGUAGES = [
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'sw', name: 'Kiswahili', flag: '🇰🇪' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦' }, // New language
+  { code: 'en', name: 'English', flag: '' },
+  { code: 'sw', name: 'Kiswahili', flag: '' },
+  { code: 'fr', name: 'Français', flag: '' },
+  { code: 'ar', name: 'العربية', flag: '' }, // New language
 ]
 ```
 
@@ -124,8 +124,8 @@ const LANGUAGES = [
 
 ### 1. Keep Keys Descriptive
 
-✅ Good: `dashboard.statistics.totalEarnings`
-❌ Bad: `dash.stats.te`
+Done Good: `dashboard.statistics.totalEarnings`
+Not done Bad: `dash.stats.te`
 
 ### 2. Use Nested Structure
 
@@ -186,15 +186,15 @@ For right-to-left languages (Arabic, Hebrew):
 
 ## Current Coverage
 
-- ✅ Common UI elements
-- ✅ Authentication flows
-- ✅ Dashboard
-- ✅ Wallet and transactions
-- ✅ Waste submission
-- ✅ Profile and settings
-- ⏳ Admin features (to be added)
-- ⏳ Error messages (to be added)
-- ⏳ Email notifications (to be added)
+- Common UI elements
+- Authentication flows
+- Dashboard
+- Wallet and transactions
+- Waste submission
+- Profile and settings
+- Admin features (to be added)
+- Error messages (to be added)
+- Email notifications (to be added)
 
 ## Resources
 

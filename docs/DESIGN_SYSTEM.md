@@ -104,9 +104,9 @@ Form input with label and error handling.
 ```tsx
 import { Input } from "@/components/ui";
 
-<Input 
-  label="Email" 
-  type="email" 
+<Input
+  label="Email"
+  type="email"
   placeholder="you@example.com"
   error="Invalid email"
 />

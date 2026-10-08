@@ -154,7 +154,7 @@ try {
 ```tsx
 const handleAction = async () => {
   toast.info("Processing...", { duration: 0 });
-  
+
   try {
     await performAction();
     toast.clearAll();
@@ -210,7 +210,7 @@ All toasts include:
 1. **Keep messages concise**: Aim for 1-2 short sentences
 2. **Use appropriate variants**: Match the severity to the variant
 3. **Provide context with titles**: Use titles for clarity when needed
-4. **Set reasonable durations**: 
+4. **Set reasonable durations**:
    - Success: 3-5 seconds
    - Info: 5 seconds
    - Warning: 7-10 seconds

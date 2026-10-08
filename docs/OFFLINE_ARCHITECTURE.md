@@ -155,7 +155,7 @@ function MyComponent() {
     <div>
       <p>Status: {isOnline ? "Online" : "Offline"}</p>
       <p>Pending: {stats.pendingSubmissions}</p>
-      
+
       {isLoading ? (
         <p>Loading...</p>
       ) : (
@@ -217,9 +217,9 @@ Displays sync status with pending count:
 ```tsx
 import { SyncStatusBadge } from "@/components/offline/OfflineIndicator";
 
-<SyncStatusBadge 
-  pendingCount={5} 
-  isSyncing={true} 
+<SyncStatusBadge
+  pendingCount={5}
+  isSyncing={true}
 />
 ```
 
@@ -276,15 +276,15 @@ Client component that initializes offline infrastructure:
 │  Action     │
 └──────┬──────┘
        │
-       ▼
+
 ┌─────────────┐    Offline    ┌─────────────┐
-│  Component  │─────────────▶ │  IndexedDB  │
+│ Component │───────────── │ IndexedDB │
 └──────┬──────┘               └──────┬──────┘
        │                             │
        │ Online                      │
-       ▼                             │
+                                    │
 ┌─────────────┐                      │
-│   API       │◀─────────────────────┘
+│ API │─────────────────────┘
 │  Request    │      Sync Manager
 └─────────────┘
 ```
@@ -322,7 +322,7 @@ import { api } from "@/lib/api/client";
 
 async function submitWaste(data) {
   const isOnline = navigator.onLine;
-  
+
   if (isOnline) {
     try {
       // Try API first
@@ -345,7 +345,7 @@ async function saveOffline(data) {
     status: "pending_sync",
     retryCount: 0,
   });
-  
+
   toast("Saved offline, will sync when online", "info");
 }
 ```

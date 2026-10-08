@@ -357,11 +357,11 @@ Check build output for:
 Expected output:
 ```
 Route (app)                              Size     First Load JS
-┌ ○ /                                   X kB          XX kB
-├ ○ /dashboard                          X kB          XX kB
-└ ○ /wallet                             X kB          XX kB
+┌ / X kB XX kB
+├ /dashboard X kB XX kB
+└ /wallet X kB XX kB
 
-○  (Static)  prerendered as static content
+  (Static) prerendered as static content
 ```
 
 ### Optimize Build
