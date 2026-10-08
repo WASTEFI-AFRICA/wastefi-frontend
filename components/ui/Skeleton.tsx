@@ -1,112 +1,66 @@
 import { cn } from "@/lib/utils";
 
-/**
- * Skeleton Component
- * Used for loading states to improve perceived performance
- */
-
 export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "text" | "circular" | "rectangular";
-  width?: string | number;
-  height?: string | number;
-  animation?: "pulse" | "wave" | "none";
+  /**
+   * Additional CSS classes
+   */
+  className?: string;
 }
 
-export function Skeleton({
-  className,
-  variant = "rectangular",
-  width,
-  height,
-  animation = "pulse",
-  ...props
-}: SkeletonProps) {
-  const animationClass =
-    animation === "pulse"
-      ? "animate-pulse"
-      : animation === "wave"
-      ? "animate-shimmer"
-      : "";
-
-  const variantClass =
-    variant === "text"
-      ? "h-4 rounded"
-      : variant === "circular"
-      ? "rounded-full"
-      : "rounded-md";
-
-  const style: React.CSSProperties = {
-    width: typeof width === "number" ? `${width}px` : width,
-    height: typeof height === "number" ? `${height}px` : height,
-  };
-
+/**
+ * Skeleton Component
+ * Provides animated loading placeholder
+ */
+export function Skeleton({ className, ...props }: SkeletonProps) {
   return (
     <div
       className={cn(
-        "bg-[var(--muted)] relative overflow-hidden",
-        variantClass,
-        animationClass,
+        "animate-pulse rounded-md bg-[var(--muted)] opacity-50",
         className
       )}
-      style={style}
       {...props}
     />
   );
 }
 
 /**
- * Skeleton variants for common use cases
+ * Skeleton variants for common UI patterns
  */
-
-export function SkeletonText({
-  lines = 1,
+export const SkeletonText: React.FC<{ lines?: number; className?: string }> = ({
+  lines = 3,
   className,
-}: {
-  lines?: number;
-  className?: string;
-}) {
+}) => {
   return (
     <div className={cn("space-y-2", className)}>
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
           key={i}
-          variant="text"
-          className={i === lines - 1 ? "w-4/5" : ""}
+          className="h-4 w-full"
+          style={{
+            width: i === lines - 1 ? "80%" : "100%",
+          }}
         />
       ))}
     </div>
   );
-}
+};
 
-export function SkeletonCard({ className }: { className?: string }) {
+export const SkeletonCard: React.FC<{ className?: string }> = ({ className }) => {
   return (
-    <div
-      className={cn(
-        "rounded-lg border border-[var(--border)] bg-[var(--card)] p-4",
-        className
-      )}
-    >
+    <div className={cn("rounded-lg border border-[var(--border)] p-4", className)}>
       <div className="space-y-3">
-        <Skeleton className="h-5 w-1/3" />
-        <Skeleton className="h-8 w-1/2" />
-        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-5 w-2/3" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-4/5" />
       </div>
     </div>
   );
-}
+};
 
-export function SkeletonAvatar({
-  size = 40,
-  className,
-}: {
-  size?: number;
-  className?: string;
-}) {
-  return (
-    <Skeleton
-      variant="circular"
-      width={size}
-      height={size}
-      className={className}
-    />
-  );
-}
+export const SkeletonAvatar: React.FC<{ className?: string }> = ({ className }) => {
+  return <Skeleton className={cn("rounded-full w-10 h-10", className)} />;
+};
+
+export const SkeletonButton: React.FC<{ className?: string }> = ({ className }) => {
+  return <Skeleton className={cn("h-10 w-24 rounded-md", className)} />;
+};

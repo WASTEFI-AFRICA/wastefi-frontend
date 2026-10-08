@@ -1,6 +1,6 @@
 /**
  * Loading Skeleton Components
- * Export all page-specific skeleton screens
+ * Centralized exports for skeleton screens
  */
 
 export { DashboardSkeleton } from "./DashboardSkeleton";
