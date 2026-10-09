@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    name: Type-check, lint and build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Next generates global types (LayoutProps, route types) into .next/types, and
+      # tsconfig includes them, so a clean checkout fails to type-check without this.
+      - name: Generate Next.js types
+        run: npx next typegen
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          # Inlined at build time. Any URL works here; the build does not call it.
+          NEXT_PUBLIC_API_URL: https://api.example.invalid/api/v1
