@@ -135,8 +135,9 @@ export default function PublicStatsPage() {
           </Link>
           <h1 className="text-3xl sm:text-4xl font-bold">Live platform stats</h1>
           <p className="mt-2 max-w-2xl text-white/85">
-            Real numbers from the running WasteFi system. No account needed. Everything
-            below is read from the deployed API and smart contracts when this page opens.
+            Live numbers from the running WasteFi system. No account needed. Everything
+            below is read from the deployed API when this page opens, and the contracts are
+            linked on-chain.
           </p>
         </div>
       </header>
@@ -193,6 +194,16 @@ export default function PublicStatsPage() {
             Weight and value count verified collections only: a delivery counts once an
             administrator or collection point has confirmed it.
           </p>
+          <div
+            role="note"
+            className="mb-4 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800"
+          >
+            <strong>Demo dataset.</strong> WasteFi has no field users yet. Most of the figures
+            below come from four accounts named &ldquo;Demo Collector&rdquo; and their
+            collections, created through the real API to exercise the system for evaluation.
+            The calculations, approval checks and storage are real; the activity is not
+            organic.
+          </div>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
             <StatCard
               loading={loading && !stats}
