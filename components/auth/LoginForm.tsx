@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button, Card, CardContent, CardHeader, CardTitle, FormError } from "@/components/ui";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { Phone, Lock } from "lucide-react";
@@ -157,6 +158,13 @@ export function LoginForm() {
             >
               Create Account
             </button>
+          </p>
+
+          {/* Public stats: no account needed */}
+          <p className="text-center text-sm">
+            <Link href="/stats" className="text-[var(--primary)] font-medium underline underline-offset-4">
+              Just looking? See live platform stats
+            </Link>
           </p>
         </form>
       </CardContent>

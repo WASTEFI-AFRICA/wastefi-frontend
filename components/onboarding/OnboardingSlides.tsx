@@ -5,6 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Navigation } from "swiper/modules";
 import { Recycle, Wallet, Leaf, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import "swiper/css";
@@ -66,7 +67,13 @@ export function OnboardingSlides() {
   return (
     <div className="flex flex-col h-screen bg-[var(--background)]">
       {/* Skip Button */}
-      <div className="flex justify-end p-4">
+      <div className="flex items-center justify-between p-4">
+        <Link
+          href="/stats"
+          className="text-sm font-medium text-[var(--primary)] underline underline-offset-4"
+        >
+          See live stats
+        </Link>
         <Button variant="ghost" size="sm" onClick={handleSkip}>
           Skip
         </Button>

@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { TopBar } from "@/components/navigation/TopBar";
 import { BottomNav } from "@/components/navigation/BottomNav";
 import { Sidebar } from "@/components/navigation/Sidebar";
+import { SampleDataNotice } from "@/components/layout/SampleDataNotice";
 
 /**
  * Collector Layout
@@ -22,6 +23,7 @@ export default function CollectorLayout({ children }: { children: ReactNode }) {
         <div className="flex-1 flex flex-col min-h-screen">
           {/* Top Bar */}
           <TopBar />
+          <SampleDataNotice />
 
           {/* Page Content */}
           <main className="flex-1 pb-20 md:pb-6">
