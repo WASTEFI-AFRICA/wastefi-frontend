@@ -150,7 +150,7 @@ export function LoginForm() {
 
           {/* Register Link */}
           <p className="text-center text-sm text-[var(--muted-foreground)]">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <button
               type="button"
               onClick={() => router.push("/register")}

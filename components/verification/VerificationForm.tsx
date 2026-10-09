@@ -314,7 +314,7 @@ export function VerificationForm({
                 <div className="p-4 rounded-lg bg-[var(--success)]/10">
                   <p className="text-sm">
                     This will approve the collection and credit{" "}
-                    <strong>${actualValue.toFixed(2)}</strong> to the collector's account.
+                    <strong>${actualValue.toFixed(2)}</strong> to the collector&apos;s account.
                   </p>
                 </div>
                 <div className="flex gap-3">

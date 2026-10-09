@@ -249,7 +249,7 @@ export function CashoutModal({
                   <span className="font-semibold">$0.00</span>
                 </div>
                 <div className="pt-2 border-t border-[var(--border)] flex justify-between">
-                  <span className="font-semibold">You'll receive</span>
+                  <span className="font-semibold">You&apos;ll receive</span>
                   <span className="font-semibold text-[var(--primary)]">
                     {formatCurrency(amount)}
                   </span>

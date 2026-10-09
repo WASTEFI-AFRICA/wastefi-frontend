@@ -118,10 +118,6 @@ function CollectionsPageContent() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (isLoading) {
-    return <CollectionsSkeleton />;
-  }
-
   // Filter and sort collections
   const filteredAndSortedCollections = useMemo(() => {
     let filtered = mockCollections;
@@ -184,6 +180,11 @@ function CollectionsPageContent() {
     { value: "highest", label: "Highest Value" },
     { value: "lowest", label: "Lowest Value" },
   ];
+
+  // Returned only after every hook above has run, so the hook order never changes.
+  if (isLoading) {
+    return <CollectionsSkeleton />;
+  }
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>

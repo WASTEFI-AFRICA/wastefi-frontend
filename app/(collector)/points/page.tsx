@@ -168,11 +168,6 @@ export default function CollectionPointsPage() {
   const [showDetail, setShowDetail] = useState(false);
   const addToast = useUIStore((state) => state.addToast);
 
-  // Get user location on mount
-  useEffect(() => {
-    handleGetLocation();
-  }, []);
-
   const handleGetLocation = async () => {
     setIsLoadingLocation(true);
     try {
@@ -187,6 +182,11 @@ export default function CollectionPointsPage() {
       setIsLoadingLocation(false);
     }
   };
+
+  // Get user location on mount
+  useEffect(() => {
+    handleGetLocation();
+  }, []);
 
   // Filter points based on search and materials
   const filteredPoints = useMemo(() => {

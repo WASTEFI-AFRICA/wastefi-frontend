@@ -158,7 +158,7 @@ export function PaymentForm({ isOpen, onClose, payment, onConfirm }: PaymentForm
                   required
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Enter the collector's mobile money number
+                  Enter the collector&apos;s mobile money number
                 </p>
               </div>
             )}
@@ -176,7 +176,7 @@ export function PaymentForm({ isOpen, onClose, payment, onConfirm }: PaymentForm
                   required
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Enter the collector's Stellar wallet address
+                  Enter the collector&apos;s Stellar wallet address
                 </p>
               </div>
             )}

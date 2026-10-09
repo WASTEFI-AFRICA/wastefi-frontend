@@ -160,7 +160,7 @@ export function PhoneVerification({ phoneNumber }: PhoneVerificationProps) {
           {/* Resend Code */}
           <div className="text-center">
             <p className="text-sm text-[var(--muted-foreground)]">
-              Didn't receive the code?{" "}
+              Didn&apos;t receive the code?{" "}
               {resendTimer > 0 ? (
                 <span className="font-medium">Resend in {resendTimer}s</span>
               ) : (

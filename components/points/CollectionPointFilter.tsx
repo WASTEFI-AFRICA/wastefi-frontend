@@ -136,7 +136,7 @@ export function CollectionPointFilter({
           </span>
           {searchQuery && (
             <Badge variant="outline" size="sm">
-              "{searchQuery}"
+              &ldquo;{searchQuery}&rdquo;
               <button
                 onClick={() => handleSearchChange("")}
                 className="ml-1"

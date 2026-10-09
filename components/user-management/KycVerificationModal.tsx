@@ -34,11 +34,11 @@ export function KycVerificationModal({
   onApprove,
   onReject,
 }: KycVerificationModalProps) {
-  if (!isOpen || !user) return null
-
   const [notes, setNotes] = React.useState('')
   const [rejectionReason, setRejectionReason] = React.useState('')
   const [showRejectForm, setShowRejectForm] = React.useState(false)
+
+  if (!isOpen || !user) return null
 
   const getDocumentLabel = (type: KycDocument['type']) => {
     switch (type) {
