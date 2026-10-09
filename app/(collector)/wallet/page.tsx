@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useMemo } from "react";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Section } from "@/components/layout/Section";
@@ -10,6 +10,7 @@ import { TransactionList } from "@/components/wallet/TransactionList";
 import { TransactionFilter, TransactionFilterType } from "@/components/wallet/TransactionFilter";
 import { CashoutModal } from "@/components/wallet/CashoutModal";
 import { WalletSkeleton } from "@/components/skeletons";
+import { usePagination } from "@/hooks/usePagination";
 import type { Transaction } from "@/types/api";
 
 /**
@@ -75,11 +76,10 @@ const mockTransactions: Transaction[] = [
   },
 ];
 
-export default function WalletPage() {
+function WalletPageContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<TransactionFilterType>("all");
   const [isCashoutModalOpen, setIsCashoutModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Simulate data loading
   useEffect(() => {
@@ -90,14 +90,28 @@ export default function WalletPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    // Simulate data fetching
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
+  // Filter transactions
+  const filteredTransactions = useMemo(
+    () =>
+      mockTransactions.filter((txn) => {
+        if (activeFilter === "all") return true;
+        return txn.type === activeFilter;
+      }),
+    [activeFilter]
+  );
 
-    return () => clearTimeout(timer);
-  }, []);
+  // Pagination. This is a hook, so it must run before the loading early return below.
+  const {
+    currentPage,
+    pageSize,
+    paginatedItems,
+    totalItems,
+    handlePageChange,
+    handlePageSizeChange,
+  } = usePagination(filteredTransactions, {
+    initialPageSize: 10,
+    persistInUrl: true,
+  });
 
   if (isLoading) {
     return <WalletSkeleton />;
@@ -109,16 +123,6 @@ export default function WalletPage() {
     pendingBalance: 32.25,
     totalEarned: 207.75,
   };
-
-  // Filter transactions
-  const filteredTransactions = mockTransactions.filter((txn) => {
-    if (activeFilter === "all") return true;
-    return txn.type === activeFilter;
-  });
-
-  if (isLoading) {
-    return <WalletSkeleton />;
-  }
 
   return (
     <>
@@ -173,5 +177,17 @@ export default function WalletPage() {
         availableBalance={walletData.balance}
       />
     </>
+  );
+}
+
+/**
+ * usePagination reads the page number from the URL with useSearchParams, which
+ * Next.js requires to sit inside a Suspense boundary so the page can be prerendered.
+ */
+export default function WalletPage() {
+  return (
+    <Suspense fallback={null}>
+      <WalletPageContent />
+    </Suspense>
   );
 }

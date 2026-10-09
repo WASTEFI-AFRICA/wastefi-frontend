@@ -24,8 +24,7 @@ const submissionSchema = z.object({
   materialType: z.string()
     .min(1, "Please select a material type for your waste submission"),
   weight: z.number({
-    required_error: "Weight is required",
-    invalid_type_error: "Please enter a valid weight",
+    error: (issue) => (issue.input === undefined ? "Weight is required" : "Please enter a valid weight"),
   })
     .min(0.1, "Weight must be at least 0.1 kg")
     .max(1000, "Weight cannot exceed 1000 kg per submission"),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { Suspense, useState, useMemo, useEffect } from "react";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Section } from "@/components/layout/Section";
@@ -11,6 +11,7 @@ import {
   CollectionDetail,
 } from "@/components/collections";
 import { CollectionsSkeleton } from "@/components/skeletons";
+import { PullToRefresh } from "@/components/ui/PullToRefresh";
 import { Package, ArrowUpDown } from "lucide-react";
 import { usePagination } from "@/hooks/usePagination";
 import type { WasteSubmission, CollectionStatus, MaterialType } from "@/types/api";
@@ -93,22 +94,20 @@ const mockCollections: WasteSubmission[] = [
 
 type SortOption = "newest" | "oldest" | "highest" | "lowest";
 
-export default function CollectionsPage() {
+function CollectionsPageContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedStatuses, setSelectedStatuses] = useState<CollectionStatus[]>([]);
   const [selectedMaterials, setSelectedMaterials] = useState<MaterialType[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [selectedCollection, setSelectedCollection] = useState<WasteSubmission | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
-  // Simulate data loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const handleRefresh = async () => {
+    // Simulate data fetching
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setLastRefresh(new Date());
+    // In production, refetch collections data
+  };
 
   useEffect(() => {
     // Simulate data fetching
@@ -186,12 +185,8 @@ export default function CollectionsPage() {
     { value: "lowest", label: "Lowest Value" },
   ];
 
-  if (isLoading) {
-    return <CollectionsSkeleton />;
-  }
-
   return (
-    <div className="animate-fade-in">
+    <PullToRefresh onRefresh={handleRefresh}>
       <Container>
       <Section>
         <PageHeader
@@ -299,16 +294,27 @@ export default function CollectionsPage() {
           </Card>
         )}
       </Section>
-      </Container>
-    </div>
-  );
-}
+
+      {/* Collection Detail Modal */}
       {selectedCollection && (
         <CollectionDetail
           collection={selectedCollection}
           onClose={() => setSelectedCollection(null)}
         />
       )}
-    </div>
+    </Container>
+    </PullToRefresh>
+  );
+}
+
+/**
+ * usePagination reads the page number from the URL with useSearchParams, which
+ * Next.js requires to sit inside a Suspense boundary so the page can be prerendered.
+ */
+export default function CollectionsPage() {
+  return (
+    <Suspense fallback={null}>
+      <CollectionsPageContent />
+    </Suspense>
   );
 }

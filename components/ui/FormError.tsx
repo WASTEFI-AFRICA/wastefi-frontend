@@ -8,13 +8,16 @@ import { AlertCircle } from "lucide-react";
 interface FormErrorProps {
   message?: string;
   className?: string;
+  /** Referenced by the input's aria-describedby so screen readers announce the error. */
+  id?: string;
 }
 
-export function FormError({ message, className = "" }: FormErrorProps) {
+export function FormError({ message, className = "", id }: FormErrorProps) {
   if (!message) return null;
 
   return (
-    <div 
+    <div
+      id={id}
       className={`flex items-start gap-2 mt-1.5 text-sm text-[var(--error)] ${className}`}
       role="alert"
       aria-live="polite"

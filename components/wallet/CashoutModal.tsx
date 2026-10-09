@@ -4,11 +4,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Button, Card, Badge } from "@/components/ui";
+import { Button, Card, Badge, FormError } from "@/components/ui";
 import { useToast } from "@/lib/hooks/useToast";
 import { X, Smartphone, Wallet, Building2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { useToast } from "@/lib/hooks/useToast";
 
 /**
  * Cashout Modal
@@ -17,13 +16,12 @@ import { useToast } from "@/lib/hooks/useToast";
 
 const cashoutSchema = z.object({
   amount: z.number({
-    required_error: "Amount is required",
-    invalid_type_error: "Please enter a valid amount",
+    error: (issue) => (issue.input === undefined ? "Amount is required" : "Please enter a valid amount"),
   })
     .min(1, "Amount must be greater than $0")
     .max(10000, "Amount cannot exceed $10,000 per transaction"),
   method: z.enum(["mobile_money", "stellar", "bank"], {
-    required_error: "Please select a payment method",
+    error: "Please select a payment method",
   }),
   destination: z.string()
     .min(1, "Destination is required")

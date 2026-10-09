@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { Suspense, useState, useMemo } from 'react'
 import { UserPlus } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Container } from '@/components/layout/Container'
@@ -207,7 +207,7 @@ const mockKycDocuments = [
   },
 ]
 
-export default function UsersPage() {
+function UsersPageContent() {
   const [users, setUsers] = useState(mockUsers)
   const [kycQueue, setKycQueue] = useState(mockKycQueue)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
@@ -355,4 +355,16 @@ export default function UsersPage() {
       )}
     </Container>
   )
+}
+
+/**
+ * usePagination reads the page number from the URL with useSearchParams, which
+ * Next.js requires to sit inside a Suspense boundary so the page can be prerendered.
+ */
+export default function UsersPage() {
+  return (
+    <Suspense fallback={null}>
+      <UsersPageContent />
+    </Suspense>
+  );
 }
