@@ -3,35 +3,47 @@
 
 /**
  * WasteFi Design System - Color Tokens
- * Brand colors optimized for accessibility and mobile readability
+ *
+ * Forest green on a soft grey-green page, with a warm orange reserved for the one
+ * primary call to action on a screen. Contrast was checked against WCAG AA (4.5:1
+ * for body text): body text 12.5:1, muted text 5.1:1, white on --primary 6.5:1,
+ * dark text on --cta 8.8:1. White on the orange would be only 2.1:1, which is why
+ * the orange button uses dark text.
  */
 :root {
-  /* Brand Colors */
-  --primary: #10b981;
-  --primary-dark: #059669;
-  --primary-light: #34d399;
-  
-  /* Neutrals */
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --border: #e2e8f0;
-  
-  /* Semantic Colors */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --info: #3b82f6;
-  
-  /* Card & Surface */
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  
+  color-scheme: light;
+
+  /* Brand */
+  --primary: #1b6b4a;
+  --primary-dark: #145238;
+  --primary-light: #2e8b62;
+
+  /* Call to action (orange). Use sparingly: one per screen. */
+  --cta: #f2a33c;
+  --cta-dark: #e0912a;
+  --cta-foreground: #1b1405;
+
+  /* Neutrals (green-tinted) */
+  --background: #e4e8e3;
+  --foreground: #14281e;
+  --muted: #d9e0d8;
+  --muted-foreground: #4a5e54;
+  --border: #c3cdc4;
+
+  /* Semantic */
+  --success: #2e8b62;
+  --warning: #f2a33c;
+  --error: #b42318;
+  --info: #1f5fa8;
+
+  /* Card & surface */
+  --card: #f7f9f6;
+  --card-foreground: #14281e;
+
   /* Accents */
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
-  
+  --accent: #d3e7dc;
+  --accent-foreground: #14281e;
+
   /* Radius */
   --radius: 0.5rem;
 }
@@ -54,6 +66,78 @@
   --color-card-foreground: var(--card-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-cta: var(--cta);
+  --color-cta-dark: var(--cta-dark);
+  --color-cta-foreground: var(--cta-foreground);
+
+  /* Palette remap. Much of the UI uses Tailwind's stock color classes
+     (text-gray-900, bg-emerald-100, text-orange-600 ...). Redefining the scales
+     here moves all of them onto the brand palette without editing each class. */
+
+  /* gray: green-tinted neutrals */
+  --color-gray-50: #f3f5f2;
+  --color-gray-100: #e6eae5;
+  --color-gray-200: #d3d9d2;
+  --color-gray-300: #bac4bb;
+  --color-gray-400: #8a9a8f;
+  --color-gray-500: #566a5e;
+  --color-gray-600: #46574d;
+  --color-gray-700: #33443a;
+  --color-gray-800: #1f3027;
+  --color-gray-900: #14281e;
+  --color-gray-950: #0c1a12;
+
+  /* emerald and green: forest green */
+  --color-emerald-50: #eef5f1;
+  --color-emerald-100: #d3e7dc;
+  --color-emerald-200: #a9d0bc;
+  --color-emerald-300: #7db79b;
+  --color-emerald-400: #4e9c79;
+  --color-emerald-500: #2e8b62;
+  --color-emerald-600: #1b6b4a;
+  --color-emerald-700: #145238;
+  --color-emerald-800: #0f3f2c;
+  --color-emerald-900: #0b2e20;
+  --color-emerald-950: #061a12;
+  --color-green-600: #1b6b4a;
+
+  /* orange: the call-to-action orange. 600 and up are dark enough for text. */
+  --color-orange-50: #fef5e7;
+  --color-orange-100: #fbe8cb;
+  --color-orange-200: #f7d199;
+  --color-orange-300: #f5bc66;
+  --color-orange-400: #f4ae4f;
+  --color-orange-500: #f2a33c;
+  --color-orange-600: #8f5206;
+  --color-orange-700: #7a4505;
+  --color-orange-800: #5e3504;
+  --color-orange-900: #432603;
+
+  /* yellow: amber, with text shades dark enough to read */
+  --color-yellow-50: #fff9e5;
+  --color-yellow-100: #fdf0c4;
+  --color-yellow-200: #fae196;
+  --color-yellow-500: #d9a406;
+  --color-yellow-600: #7d5c00;
+  --color-yellow-700: #634800;
+
+  /* red and blue: kept distinct for errors and info, deepened for contrast */
+  --color-red-50: #fdecea;
+  --color-red-100: #fadad6;
+  --color-red-200: #f5b8b1;
+  --color-red-300: #ee8e85;
+  --color-red-500: #d63b2f;
+  --color-red-600: #b42318;
+  --color-red-700: #8f1b12;
+  --color-red-900: #5a100b;
+  --color-blue-50: #eaf2fb;
+  --color-blue-100: #dce9f7;
+  --color-blue-200: #b9d3f0;
+  --color-blue-600: #1f5fa8;
+  --color-blue-700: #174a82;
+  --color-blue-900: #0f2d4f;
+  --color-purple-100: #ede3f7;
+  --color-purple-600: #6b3fa0;
   
   /* Typography */
   --font-sans: var(--font-geist-sans);
@@ -71,19 +155,10 @@
   --radius-full: 9999px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f1f5f9;
-    --muted: #1e293b;
-    --muted-foreground: #94a3b8;
-    --border: #334155;
-    --card: #1e293b;
-    --card-foreground: #f1f5f9;
-    --accent: #1e293b;
-    --accent-foreground: #f1f5f9;
-  }
-}
+/* Light theme only. A dark variant used to flip these tokens on prefers-color-scheme,
+   but most components use fixed color classes (text-gray-900 and so on) that do not
+   follow the tokens, so dark mode left dark text on dark cards. Reintroduce it only
+   together with a pass over those classes. */
 
 /**
  * Base Styles

@@ -4,8 +4,8 @@
   "description": "Mobile-first waste banking platform for emerging markets",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#10b981",
+  "background_color": "#e4e8e3",
+  "theme_color": "#1b6b4a",
   "orientation": "portrait",
   "icons": [
     {

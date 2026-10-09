@@ -157,7 +157,7 @@ export default function CollectorDashboardPage() {
 
       {/* Quick Actions - Mobile FAB alternative */}
       <div className="fixed bottom-20 right-4 sm:hidden">
-        <Button size="lg" className="rounded-full shadow-lg">
+        <Button variant="cta" size="lg" className="rounded-full shadow-lg" aria-label="Submit a collection">
           <Plus className="w-6 h-6" />
         </Button>
       </div>

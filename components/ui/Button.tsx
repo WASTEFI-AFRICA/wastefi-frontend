@@ -11,8 +11,10 @@ const buttonVariants = cva(
           "bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)] focus-visible:ring-[var(--primary)]",
         secondary:
           "bg-[var(--muted)] text-[var(--foreground)] hover:bg-[var(--muted)]/80",
+        cta:
+          "bg-[var(--cta)] text-[var(--cta-foreground)] font-semibold shadow-sm hover:bg-[var(--cta-dark)] focus-visible:ring-[var(--cta)]",
         outline:
-          "border border-[var(--border)] bg-transparent hover:bg-[var(--accent)]",
+          "border border-[var(--primary)] text-[var(--primary)] bg-transparent hover:bg-[var(--accent)]",
         ghost: "hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)]",
         destructive:
           "bg-[var(--error)] text-white hover:bg-[var(--error)]/90 focus-visible:ring-[var(--error)]",

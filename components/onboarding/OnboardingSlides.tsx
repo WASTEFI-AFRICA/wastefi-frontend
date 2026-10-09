@@ -104,7 +104,7 @@ export function OnboardingSlides() {
         {isLastSlide ? (
           <>
             <Button
-              variant="primary"
+              variant="cta"
               size="lg"
               fullWidth
               onClick={handleGetStarted}
@@ -117,7 +117,7 @@ export function OnboardingSlides() {
           </>
         ) : (
           <Button
-            variant="outline"
+            variant="cta"
             size="lg"
             fullWidth
             onClick={() => {
