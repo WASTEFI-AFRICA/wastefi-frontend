@@ -19,7 +19,7 @@ export function ToastDemo() {
         <Button
           variant="success"
           onClick={() =>
-            toast.success("Your submission has been saved successfully!", "Success")
+            toast.success("Your submission has been saved successfully!", { title: "Success" })
           }
         >
           Show Success
@@ -28,7 +28,7 @@ export function ToastDemo() {
         <Button
           variant="destructive"
           onClick={() =>
-            toast.error("Failed to process request. Please try again.", "Error")
+            toast.error("Failed to process request. Please try again.", { title: "Error" })
           }
         >
           Show Error
@@ -37,7 +37,7 @@ export function ToastDemo() {
         <Button
           variant="outline"
           onClick={() =>
-            toast.warning("Your session will expire in 5 minutes.", "Warning")
+            toast.warning("Your session will expire in 5 minutes.", { title: "Warning" })
           }
         >
           Show Warning
@@ -46,7 +46,7 @@ export function ToastDemo() {
         <Button
           variant="secondary"
           onClick={() =>
-            toast.info("New feature: You can now export your collection history!", "Info")
+            toast.info("New feature: You can now export your collection history!", { title: "Info" })
           }
         >
           Show Info
@@ -55,9 +55,8 @@ export function ToastDemo() {
         <Button
           variant="outline"
           onClick={() =>
-            toast.toast({
+            toast.show("This toast will disappear in 10 seconds", {
               title: "Custom Toast",
-              message: "This toast will disappear in 10 seconds",
               variant: "success",
               duration: 10000,
             })
@@ -68,7 +67,7 @@ export function ToastDemo() {
         
         <Button
           variant="ghost"
-          onClick={() => toast.dismissAll()}
+          onClick={() => toast.clearAll()}
         >
           Dismiss All
         </Button>
