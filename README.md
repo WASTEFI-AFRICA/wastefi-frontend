@@ -35,6 +35,17 @@ Routes are grouped by the role that uses them:
 
 Outside the groups: `/` (landing), `/onboarding`, `/verify-phone`, `/terms`.
 
+`/stats` is public and needs no account. It reads the deployed API and shows live platform
+numbers, the collection points, and the smart contracts on testnet.
+
+## What is real and what is sample data
+
+Only `/stats` is connected to the backend. The screens behind sign-in (dashboard,
+wallet, collections, profile, and the collection-point and admin screens) render
+hard-coded sample data, and each shows a notice saying so. The sign-in form is a
+demo: it signs in a placeholder user without calling the API, although the API's own
+login is real and tested. Connecting those screens is the main piece of remaining work.
+
 ## Offline behaviour
 
 The offline path is the part of this app most likely to surprise you, so it is
