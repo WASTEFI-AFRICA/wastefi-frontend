@@ -1,10 +1,15 @@
+import { Suspense } from "react";
 import { LoginForm } from "@/components/auth/LoginForm";
 
 /**
  * Login Page
- * User authentication
+ * User authentication. LoginForm reads ?next=, which needs a Suspense boundary.
  */
 
 export default function LoginPage() {
-  return <LoginForm />;
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
 }

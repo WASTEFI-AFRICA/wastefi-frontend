@@ -5,6 +5,7 @@ import { TopBar } from "@/components/navigation/TopBar";
 import { BottomNav } from "@/components/navigation/BottomNav";
 import { Sidebar } from "@/components/navigation/Sidebar";
 import { SampleDataNotice } from "@/components/layout/SampleDataNotice";
+import { RequireAuth } from "@/components/auth/RequireAuth";
 
 /**
  * Collector Layout
@@ -14,26 +15,26 @@ import { SampleDataNotice } from "@/components/layout/SampleDataNotice";
 
 export default function CollectorLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-[var(--background)]">
-      <div className="md:flex">
-        {/* Sidebar - Desktop only */}
-        <Sidebar />
+    <RequireAuth allow={["collector"]}>
+      <div className="min-h-screen bg-[var(--background)]">
+        <div className="md:flex">
+          {/* Sidebar - Desktop only */}
+          <Sidebar />
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-h-screen">
-          {/* Top Bar */}
-          <TopBar />
-          <SampleDataNotice />
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col min-h-screen">
+            {/* Top Bar */}
+            <TopBar />
+            <SampleDataNotice />
 
-          {/* Page Content */}
-          <main className="flex-1 pb-20 md:pb-6">
-            {children}
-          </main>
+            {/* Page Content */}
+            <main className="flex-1 pb-20 md:pb-6">{children}</main>
+          </div>
         </div>
-      </div>
 
-      {/* Bottom Navigation - Mobile only */}
-      <BottomNav />
-    </div>
+        {/* Bottom Navigation - Mobile only */}
+        <BottomNav />
+      </div>
+    </RequireAuth>
   );
 }

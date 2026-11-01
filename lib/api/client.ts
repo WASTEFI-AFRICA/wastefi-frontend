@@ -1,4 +1,11 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from "axios";
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosError,
+  InternalAxiosRequestConfig,
+} from "axios";
+import { useAuthStore } from "@/store/authStore";
+import { refreshSession } from "./auth";
 
 /**
  * API Client Configuration
@@ -20,16 +27,13 @@ const apiClient: AxiosInstance = axios.create({
 
 /**
  * Request interceptor
- * Add authentication token to all requests
+ * Add the signed-in user's access token to every request
  */
 apiClient.interceptors.request.use(
   (config) => {
-    // Get token from localStorage (will be set by auth flow)
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    const token = useAuthStore.getState().token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -38,20 +42,48 @@ apiClient.interceptors.request.use(
   }
 );
 
+// One refresh at a time: requests that fail together wait for the same refresh.
+let refreshing: Promise<string> | null = null;
+
+async function refreshAccessToken(): Promise<string> {
+  const { refreshToken } = useAuthStore.getState();
+  if (!refreshToken) throw new Error("No session to refresh");
+  const session = await refreshSession(refreshToken);
+  useAuthStore.getState().setAuth(session.user, session.accessToken, session.refreshToken);
+  return session.accessToken;
+}
+
+function endSession() {
+  useAuthStore.getState().logout();
+  if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+    const next = encodeURIComponent(window.location.pathname);
+    window.location.href = `/login?next=${next}`;
+  }
+}
+
 /**
  * Response interceptor
- * Handle common error cases
+ * On a 401, refresh the session once and retry; if that fails, sign out
  */
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    // Handle unauthorized access
-    if (error.response?.status === 401) {
-      // Clear auth token and redirect to login
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("auth_token");
-        window.location.href = "/login";
+  async (error: AxiosError) => {
+    const original = error.config as (InternalAxiosRequestConfig & { _retried?: boolean }) | undefined;
+
+    if (error.response?.status === 401 && original && !original._retried) {
+      original._retried = true;
+      try {
+        refreshing = refreshing ?? refreshAccessToken();
+        const token = await refreshing;
+        original.headers.set("Authorization", `Bearer ${token}`);
+        return apiClient.request(original);
+      } catch {
+        endSession();
+      } finally {
+        refreshing = null;
       }
+    } else if (error.response?.status === 401) {
+      endSession();
     }
 
     // Handle network errors

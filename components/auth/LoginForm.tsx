@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button, Card, CardContent, CardHeader, CardTitle, FormError } from "@/components/ui";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { homePath, login, safeNextPath } from "@/lib/api/auth";
 import { Phone, Lock } from "lucide-react";
 
 /**
  * Login Form
- * User authentication with phone and password
+ * Signs in through POST /api/v1/auth/login and sends the user to the home screen
+ * for their role, or back to the page that asked them to sign in.
  */
 
 const loginSchema = z.object({
@@ -28,8 +30,18 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSlow, setIsSlow] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const setAuth = useAuthStore((state) => state.setAuth);
+
+  // The demo API sleeps when idle; tell the user why the first sign-in is slow.
+  useEffect(() => {
+    if (!isLoading) return;
+    const timer = setTimeout(() => setIsSlow(true), 4000);
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   const {
     register,
@@ -41,34 +53,18 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    
+    setIsSlow(false);
+    setError(null);
+
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      // Mock user data
-      const mockUser = {
-        id: "user-123",
-        name: "John Collector",
-        email: "",
-        phone: data.phone,
-        role: "collector" as const,
-        kycStatus: "approved" as const,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      
-      const mockToken = "mock-jwt-token-" + Date.now();
-      
-      // Set authentication
-      setAuth(mockUser, mockToken);
-      
-      // Navigate to dashboard
-      router.push("/dashboard");
-    } catch (error) {
-      console.error("Login error:", error);
+      const session = await login(data.phone, data.password);
+      setAuth(session.user, session.accessToken, session.refreshToken);
+      router.replace(safeNextPath(searchParams.get("next")) ?? homePath(session.user.role));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Sign-in failed. Please try again.");
     } finally {
       setIsLoading(false);
+      setIsSlow(false);
     }
   };
 
@@ -82,6 +78,15 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {error && (
+            <div
+              role="alert"
+              className="rounded-md border border-[var(--error)] bg-[var(--background)] p-3 text-sm text-[var(--error)]"
+            >
+              {error}
+            </div>
+          )}
+
           {/* Phone Number */}
           <div>
             <div className="relative">
@@ -126,17 +131,6 @@ export function LoginForm() {
             )}
           </div>
 
-          {/* Forgot Password */}
-          <div className="text-right">
-            <button
-              type="button"
-              className="text-sm text-[var(--primary)] hover:underline"
-              onClick={() => router.push("/forgot-password")}
-            >
-              Forgot Password?
-            </button>
-          </div>
-
           {/* Submit Button */}
           <Button
             type="submit"
@@ -147,6 +141,12 @@ export function LoginForm() {
           >
             Sign In
           </Button>
+
+          {isSlow && (
+            <p className="text-center text-sm text-[var(--muted-foreground)]" role="status">
+              Waking up the demo server. The first sign-in can take up to a minute.
+            </p>
+          )}
 
           {/* Register Link */}
           <p className="text-center text-sm text-[var(--muted-foreground)]">

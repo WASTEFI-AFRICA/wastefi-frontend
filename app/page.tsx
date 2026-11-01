@@ -3,19 +3,18 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { homePath } from "@/lib/api/auth";
 
 export default function Home() {
   const router = useRouter();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
-    // Redirect to dashboard if authenticated, otherwise to onboarding
-    if (isAuthenticated) {
-      router.push("/dashboard");
-    } else {
-      router.push("/onboarding");
-    }
-  }, [isAuthenticated, router]);
+    // Wait for the stored session, then go to the user's home screen or onboarding
+    if (!hasHydrated) return;
+    router.replace(user ? homePath(user.role) : "/onboarding");
+  }, [hasHydrated, user, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
