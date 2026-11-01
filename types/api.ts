@@ -103,9 +103,15 @@ export interface WasteSubmission {
   collectorId: string;
   collectionPointId: string;
   materialType: MaterialType;
+  /** The specific material, for example PET within plastic. */
+  materialDetail?: string;
   weight: number;
   photos: string[];
   status: CollectionStatus;
+  collectorName?: string;
+  collectionPointName?: string;
+  /** Currency of estimatedValue and actualValue, for example KES. */
+  currency?: string;
   location?: {
     lat: number;
     lng: number;

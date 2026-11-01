@@ -17,6 +17,8 @@ interface VerificationFormProps {
   onApprove: (data: { actualWeight: number; actualValue: number; notes?: string }) => void;
   onReject: (reason: string) => void;
   onClose: () => void;
+  /** True while the decision is being sent; the confirm buttons are disabled. */
+  isSubmitting?: boolean;
 }
 
 const rejectionReasons = [
@@ -33,6 +35,7 @@ export function VerificationForm({
   onApprove,
   onReject,
   onClose,
+  isSubmitting = false,
 }: VerificationFormProps) {
   const [action, setAction] = useState<"approve" | "reject" | null>(null);
   const [actualWeight, setActualWeight] = useState(submission.weight);
@@ -48,6 +51,7 @@ export function VerificationForm({
   };
 
   const actualValue = calculateValue(actualWeight);
+  const formatMoney = (value: number) => `${submission.currency ?? "KES"} ${value.toFixed(2)}`;
 
   const handleApprove = () => {
     onApprove({
@@ -102,12 +106,18 @@ export function VerificationForm({
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Main Photo */}
-              <div className="aspect-video rounded-lg bg-[var(--muted)] overflow-hidden">
-                <img
-                  src={submission.photos[selectedPhotoIndex]}
-                  alt={`Collection photo ${selectedPhotoIndex + 1}`}
-                  className="w-full h-full object-cover"
-                />
+              <div className="aspect-video rounded-lg bg-[var(--muted)] overflow-hidden flex items-center justify-center">
+                {submission.photos.length > 0 ? (
+                  <img
+                    src={submission.photos[selectedPhotoIndex]}
+                    alt={`Collection photo ${selectedPhotoIndex + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <p className="text-sm text-[var(--muted-foreground)]">
+                    No photos were submitted with this collection.
+                  </p>
+                )}
               </div>
 
               {/* Thumbnails */}
@@ -156,7 +166,7 @@ export function VerificationForm({
                 <div className="flex items-center justify-between py-2 border-b border-[var(--border)]">
                   <span className="text-sm text-[var(--muted-foreground)]">Estimated Value</span>
                   <span className="font-semibold text-[var(--success)]">
-                    ${submission.estimatedValue?.toFixed(2)}
+                    {formatMoney(submission.estimatedValue ?? 0)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-2">
@@ -202,7 +212,7 @@ export function VerificationForm({
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Actual Value</span>
                     <span className="text-xl font-bold text-[var(--success)]">
-                      ${actualValue.toFixed(2)}
+                      {formatMoney(actualValue)}
                     </span>
                   </div>
                 </div>
@@ -294,7 +304,9 @@ export function VerificationForm({
                     size="lg"
                     fullWidth
                     onClick={handleReject}
+                    loading={isSubmitting}
                     disabled={
+                      isSubmitting ||
                       !rejectionReason ||
                       (rejectionReason === "Other" && !customReason)
                     }
@@ -313,8 +325,9 @@ export function VerificationForm({
               <CardContent className="space-y-4">
                 <div className="p-4 rounded-lg bg-[var(--success)]/10">
                   <p className="text-sm">
-                    This will approve the collection and credit{" "}
-                    <strong>${actualValue.toFixed(2)}</strong> to the collector&apos;s account.
+                    This approves the collection at <strong>{formatMoney(actualValue)}</strong>.
+                    It is then recorded on Stellar, and WASTE is minted to the collector at
+                    the on-chain price for the material.
                   </p>
                 </div>
                 <div className="flex gap-3">
@@ -331,6 +344,8 @@ export function VerificationForm({
                     size="lg"
                     fullWidth
                     onClick={handleApprove}
+                    loading={isSubmitting}
+                    disabled={isSubmitting}
                     className="bg-[var(--success)] hover:bg-[var(--success)]/90"
                   >
                     Confirm Approval

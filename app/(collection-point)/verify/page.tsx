@@ -1,154 +1,164 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { RefreshCw } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Section } from "@/components/layout/Section";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import {
   SubmissionQueue,
   VerificationForm,
   BulkActions,
+  ChainProgress,
+  isChainSettled,
 } from "@/components/verification";
 import { useUIStore } from "@/store/uiStore";
+import {
+  getCollection,
+  listVerificationQueue,
+  reviewCollection,
+  toSubmission,
+  type ApiCollection,
+} from "@/lib/api/collections";
 import type { WasteSubmission } from "@/types/api";
 
 /**
  * Verification Page
- * Review and verify pending waste submissions
+ * The collection point's queue of submissions waiting for review, from the API.
+ * Approving one also records it on Stellar and mints WASTE to the collector; the
+ * "Approved just now" list follows that until the payment lands.
  */
 
-// Mock pending submissions
-const mockSubmissions: WasteSubmission[] = [
-  {
-    id: "sub-101",
-    collectorId: "user-001",
-    collectionPointId: "point-1",
-    materialType: "plastic",
-    weight: 5.5,
-    photos: [
-      "https://via.placeholder.com/800x600?text=Plastic+Waste+1",
-      "https://via.placeholder.com/800x600?text=Plastic+Waste+2",
-    ],
-    status: "pending",
-    location: { lat: 40.7128, lng: -74.006 },
-    estimatedValue: 5.5,
-    createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-  },
-  {
-    id: "sub-102",
-    collectorId: "user-002",
-    collectionPointId: "point-1",
-    materialType: "cardboard",
-    weight: 12.3,
-    photos: [
-      "https://via.placeholder.com/800x600?text=Cardboard+1",
-      "https://via.placeholder.com/800x600?text=Cardboard+2",
-      "https://via.placeholder.com/800x600?text=Cardboard+3",
-    ],
-    status: "pending",
-    location: { lat: 40.7589, lng: -73.9851 },
-    estimatedValue: 6.15,
-    createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: "sub-103",
-    collectorId: "user-003",
-    collectionPointId: "point-1",
-    materialType: "metal",
-    weight: 8.7,
-    photos: ["https://via.placeholder.com/800x600?text=Metal+Waste"],
-    status: "pending",
-    location: { lat: 40.7829, lng: -73.9654 },
-    estimatedValue: 10.44,
-    createdAt: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
-  },
-  {
-    id: "sub-104",
-    collectorId: "user-004",
-    collectionPointId: "point-1",
-    materialType: "paper",
-    weight: 6.2,
-    photos: [
-      "https://via.placeholder.com/800x600?text=Paper+1",
-      "https://via.placeholder.com/800x600?text=Paper+2",
-    ],
-    status: "pending",
-    location: { lat: 40.7358, lng: -74.0014 },
-    estimatedValue: 2.48,
-    createdAt: new Date(Date.now() - 120 * 60 * 1000).toISOString(),
-  },
-  {
-    id: "sub-105",
-    collectorId: "user-005",
-    collectionPointId: "point-1",
-    materialType: "glass",
-    weight: 15.2,
-    photos: ["https://via.placeholder.com/800x600?text=Glass+Bottles"],
-    status: "pending",
-    location: { lat: 40.7489, lng: -73.9680 },
-    estimatedValue: 1.52,
-    createdAt: new Date(Date.now() - 150 * 60 * 1000).toISOString(),
-  },
-];
+const POLL_MS = 4000;
+
+function errorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error && error.message ? error.message : fallback;
+}
 
 export default function VerificationPage() {
-  const [submissions, setSubmissions] = useState(mockSubmissions);
-  const [selectedSubmission, setSelectedSubmission] = useState<WasteSubmission | null>(
-    null
-  );
+  const [queue, setQueue] = useState<ApiCollection[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<WasteSubmission | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [approved, setApproved] = useState<ApiCollection[]>([]);
   const addToast = useUIStore((state) => state.addToast);
 
-  const handleApprove = (
-    submissionId: string,
-    data: { actualWeight: number; actualValue: number; notes?: string }
+  // Every state update happens when the request settles, so this can start from an effect.
+  const fetchQueue = useCallback(
+    () =>
+      listVerificationQueue()
+        .then((collections) => {
+          setQueue(collections);
+          setLoadError(null);
+        })
+        .catch((error) =>
+          setLoadError(errorMessage(error, "Could not load the verification queue."))
+        )
+        .finally(() => setIsLoading(false)),
+    []
+  );
+
+  useEffect(() => {
+    void fetchQueue();
+  }, [fetchQueue]);
+
+  const reloadQueue = () => {
+    setIsLoading(true);
+    setLoadError(null);
+    void fetchQueue();
+  };
+
+  // Follow approved collections until they are paid on-chain.
+  const inProgressKey = approved
+    .filter((c) => !isChainSettled(c.chainStatus))
+    .map((c) => c.id)
+    .join(",");
+  useEffect(() => {
+    if (!inProgressKey) return;
+    const timer = setInterval(async () => {
+      const ids = inProgressKey.split(",");
+      const updates = await Promise.allSettled(ids.map((id) => getCollection(id)));
+      setApproved((current) =>
+        current.map((c) => {
+          const index = ids.indexOf(c.id);
+          const update = index >= 0 ? updates[index] : undefined;
+          return update?.status === "fulfilled" ? update.value : c;
+        })
+      );
+    }, POLL_MS);
+    return () => clearInterval(timer);
+  }, [inProgressKey]);
+
+  const submissions = useMemo(() => queue.map(toSubmission), [queue]);
+
+  const removeFromQueue = (ids: string[]) => {
+    setQueue((current) => current.filter((c) => !ids.includes(c.id)));
+    setSelectedIds((current) => current.filter((id) => !ids.includes(id)));
+  };
+
+  /** Send one decision. Returns whether it succeeded. */
+  const review = async (
+    id: string,
+    decision: { approved: boolean; notes?: string; adjustedWeight?: number }
+  ): Promise<boolean> => {
+    try {
+      const updated = await reviewCollection(id, decision);
+      removeFromQueue([id]);
+      if (decision.approved) setApproved((current) => [updated, ...current]);
+      return true;
+    } catch (error) {
+      addToast(errorMessage(error, "The decision could not be saved. Please try again."), "error");
+      return false;
+    }
+  };
+
+  const handleApprove = async (
+    submission: WasteSubmission,
+    data: { actualWeight: number; notes?: string }
   ) => {
-    console.log("Approve submission:", submissionId, data);
-    
-    // Remove from queue
-    setSubmissions((prev) => prev.filter((s) => s.id !== submissionId));
-    setSelectedSubmission(null);
-    setSelectedIds((prev) => prev.filter((id) => id !== submissionId));
-    
-    addToast("Submission approved successfully", "success");
-  };
-
-  const handleReject = (submissionId: string, reason: string) => {
-    console.log("Reject submission:", submissionId, "Reason:", reason);
-    
-    // Remove from queue
-    setSubmissions((prev) => prev.filter((s) => s.id !== submissionId));
-    setSelectedSubmission(null);
-    setSelectedIds((prev) => prev.filter((id) => id !== submissionId));
-    
-    addToast("Submission rejected", "error");
-  };
-
-  const handleBulkApprove = () => {
-    if (
-      confirm(
-        `Are you sure you want to approve ${selectedIds.length} submissions? This action cannot be undone.`
-      )
-    ) {
-      console.log("Bulk approve:", selectedIds);
-      
-      setSubmissions((prev) => prev.filter((s) => !selectedIds.includes(s.id)));
-      setSelectedIds([]);
-      
-      addToast(`${selectedIds.length} submissions approved`, "success");
+    setIsSubmitting(true);
+    const ok = await review(submission.id, {
+      approved: true,
+      notes: data.notes,
+      adjustedWeight: data.actualWeight !== submission.weight ? data.actualWeight : undefined,
+    });
+    setIsSubmitting(false);
+    if (ok) {
+      setSelected(null);
+      addToast("Approved. Recording it on Stellar now.", "success");
     }
   };
 
-  const handleBulkReject = () => {
+  const handleReject = async (submission: WasteSubmission, reason: string) => {
+    setIsSubmitting(true);
+    const ok = await review(submission.id, { approved: false, notes: reason });
+    setIsSubmitting(false);
+    if (ok) {
+      setSelected(null);
+      addToast("Submission rejected", "info");
+    }
+  };
+
+  const handleBulkApprove = async () => {
+    if (!confirm(`Approve ${selectedIds.length} submissions? This cannot be undone.`)) return;
+    let done = 0;
+    for (const id of [...selectedIds]) {
+      if (await review(id, { approved: true })) done += 1;
+    }
+    addToast(`${done} submissions approved`, "success");
+  };
+
+  const handleBulkReject = async () => {
     const reason = prompt("Enter rejection reason for all selected submissions:");
-    if (reason) {
-      console.log("Bulk reject:", selectedIds, "Reason:", reason);
-      
-      setSubmissions((prev) => prev.filter((s) => !selectedIds.includes(s.id)));
-      setSelectedIds([]);
-      
-      addToast(`${selectedIds.length} submissions rejected`, "error");
+    if (!reason) return;
+    let done = 0;
+    for (const id of [...selectedIds]) {
+      if (await review(id, { approved: false, notes: reason })) done += 1;
     }
+    addToast(`${done} submissions rejected`, "info");
   };
 
   return (
@@ -157,33 +167,87 @@ export default function VerificationPage() {
         <PageHeader
           title="Verify Collections"
           description="Review and approve pending submissions"
+          actions={
+            <Button variant="outline" size="sm" onClick={reloadQueue} disabled={isLoading}>
+              <RefreshCw className="w-4 h-4 mr-2" aria-hidden="true" />
+              Refresh
+            </Button>
+          }
         />
       </Section>
 
+      {approved.length > 0 && (
+        <Section spacing="sm">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Approved just now</CardTitle>
+            </CardHeader>
+            <CardContent className="divide-y divide-[var(--border)] p-0">
+              {approved.map((collection) => (
+                <div key={collection.id} className="p-4 space-y-2">
+                  <p className="text-sm">
+                    <span className="font-medium">
+                      {collection.weight} kg {collection.materialType}
+                    </span>
+                    {collection.collector && (
+                      <span className="text-[var(--muted-foreground)]">
+                        {" "}
+                        from {collection.collector.firstName} {collection.collector.lastName}
+                      </span>
+                    )}
+                  </p>
+                  <ChainProgress collection={collection} />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </Section>
+      )}
+
       <Section spacing="sm">
-        <SubmissionQueue
-          submissions={submissions}
-          onViewSubmission={setSelectedSubmission}
-          onBulkSelect={setSelectedIds}
-          selectedIds={selectedIds}
-        />
+        {loadError ? (
+          <Card>
+            <CardContent className="p-6 space-y-3 text-center">
+              <p role="alert" className="text-[var(--error)]">
+                {loadError}
+              </p>
+              <Button variant="outline" onClick={reloadQueue}>
+                Try again
+              </Button>
+            </CardContent>
+          </Card>
+        ) : isLoading && queue.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center text-[var(--muted-foreground)]" role="status">
+              Loading the verification queue...
+            </CardContent>
+          </Card>
+        ) : (
+          <SubmissionQueue
+            submissions={submissions}
+            onViewSubmission={setSelected}
+            onBulkSelect={setSelectedIds}
+            selectedIds={selectedIds}
+          />
+        )}
       </Section>
 
       {/* Verification Form Modal */}
-      {selectedSubmission && (
+      {selected && (
         <VerificationForm
-          submission={selectedSubmission}
-          onApprove={(data) => handleApprove(selectedSubmission.id, data)}
-          onReject={(reason) => handleReject(selectedSubmission.id, reason)}
-          onClose={() => setSelectedSubmission(null)}
+          submission={selected}
+          isSubmitting={isSubmitting}
+          onApprove={(data) => void handleApprove(selected, data)}
+          onReject={(reason) => void handleReject(selected, reason)}
+          onClose={() => setSelected(null)}
         />
       )}
 
       {/* Bulk Actions */}
       <BulkActions
         selectedCount={selectedIds.length}
-        onApproveAll={handleBulkApprove}
-        onRejectAll={handleBulkReject}
+        onApproveAll={() => void handleBulkApprove()}
+        onRejectAll={() => void handleBulkReject()}
         onClearSelection={() => setSelectedIds([])}
       />
     </Container>

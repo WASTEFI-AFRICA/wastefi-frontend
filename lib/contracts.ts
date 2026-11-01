@@ -35,3 +35,7 @@ export function contractExplorerUrl(address: string): string {
 export function accountExplorerUrl(address: string): string {
   return `https://stellar.expert/explorer/testnet/account/${address}`;
 }
+
+export function txExplorerUrl(hash: string): string {
+  return `https://stellar.expert/explorer/testnet/tx/${hash}`;
+}

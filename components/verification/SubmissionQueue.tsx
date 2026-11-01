@@ -92,9 +92,17 @@ export function SubmissionQueue({
                         <div>
                           <h4 className="font-semibold capitalize">
                             {submission.materialType.replace("-", " ")}
+                            {submission.materialDetail && (
+                              <span className="font-normal text-[var(--muted-foreground)] normal-case">
+                                {" "}
+                                · {submission.materialDetail}
+                              </span>
+                            )}
                           </h4>
                           <p className="text-sm text-[var(--muted-foreground)]">
-                            ID: {submission.id.slice(0, 8)}
+                            {[submission.collectorName, submission.collectionPointName]
+                              .filter(Boolean)
+                              .join(" at ") || `ID: ${submission.id.slice(0, 8)}`}
                           </p>
                         </div>
                         <CollectionStatusBadge status={submission.status} />
@@ -108,7 +116,7 @@ export function SubmissionQueue({
                         <div>
                           <span className="text-[var(--muted-foreground)]">Value:</span>{" "}
                           <span className="font-medium text-[var(--success)]">
-                            ${submission.estimatedValue?.toFixed(2) || "0.00"}
+                            {submission.currency ?? "KES"} {(submission.estimatedValue ?? 0).toFixed(2)}
                           </span>
                         </div>
                         <div>
@@ -118,7 +126,7 @@ export function SubmissionQueue({
                         <div>
                           <span className="text-[var(--muted-foreground)]">Time:</span>{" "}
                           <span className="font-medium">
-                            {format(new Date(submission.createdAt), "HH:mm")}
+                            {format(new Date(submission.createdAt), "d MMM, HH:mm")}
                           </span>
                         </div>
                       </div>

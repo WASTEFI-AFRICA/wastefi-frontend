@@ -6,3 +6,4 @@
 export { SubmissionQueue } from "./SubmissionQueue";
 export { VerificationForm } from "./VerificationForm";
 export { BulkActions } from "./BulkActions";
+export { ChainProgress, isChainSettled } from "./ChainProgress";
