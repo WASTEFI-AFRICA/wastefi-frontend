@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import type { Swiper as SwiperInstance } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Navigation } from "swiper/modules";
-import { Recycle, Wallet, Leaf, TrendingUp } from "lucide-react";
+import { Recycle, Coins, ShieldCheck, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,35 +25,41 @@ interface Slide {
   color: string;
 }
 
+// Only describe what the app does today: people evaluating it will check.
 const slides: Slide[] = [
   {
     icon: Recycle,
     title: "Collect. Earn. Impact.",
-    description: "Turn waste into income. Get paid for every kilogram of recyclable material you collect.",
+    description:
+      "Turn waste into income. Deliver sorted recyclables to a collection point and get paid by the kilogram.",
     color: "text-[var(--primary)]",
   },
   {
-    icon: Wallet,
-    title: "Easy Mobile Payments",
-    description: "Instant payments to your mobile money account or digital wallet. Cash out anytime.",
+    icon: Coins,
+    title: "Paid on Stellar",
+    description:
+      "When the collection point approves your delivery, it is recorded on the Stellar blockchain and you are paid in WASTE.",
     color: "text-[var(--info)]",
   },
   {
-    icon: Leaf,
-    title: "Environmental Impact",
-    description: "Track your CO₂ reduction and see the real difference you're making for the planet.",
+    icon: ShieldCheck,
+    title: "Proof You Can Check",
+    description:
+      "Every payment links to its transaction, so you, the collection point and anyone else can verify it.",
     color: "text-[var(--success)]",
   },
   {
     icon: TrendingUp,
-    title: "Grow Your Earnings",
-    description: "The more you collect, the more you earn. Build a sustainable income stream.",
+    title: "Build Your Record",
+    description:
+      "Each verified delivery adds to your reputation on-chain. The more you collect, the more you earn.",
     color: "text-[var(--warning)]",
   },
 ];
 
 export function OnboardingSlides() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [swiper, setSwiper] = useState<SwiperInstance | null>(null);
   const router = useRouter();
   const isLastSlide = activeIndex === slides.length - 1;
 
@@ -84,7 +91,8 @@ export function OnboardingSlides() {
         <Swiper
           modules={[Pagination, Navigation]}
           pagination={{ clickable: true }}
-          onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
+          onSwiper={setSwiper}
+          onSlideChange={(instance) => setActiveIndex(instance.activeIndex)}
           className="w-full max-w-md"
         >
           {slides.map((slide, index) => {
@@ -116,10 +124,10 @@ export function OnboardingSlides() {
               fullWidth
               onClick={handleGetStarted}
             >
-              Get Started
+              Create an Account
             </Button>
             <Button variant="outline" size="lg" fullWidth onClick={handleSkip}>
-              I Already Have an Account
+              Sign In or Try the Demo
             </Button>
           </>
         ) : (
@@ -127,12 +135,7 @@ export function OnboardingSlides() {
             variant="cta"
             size="lg"
             fullWidth
-            onClick={() => {
-              const nextIndex = activeIndex + 1;
-              if (nextIndex < slides.length) {
-                setActiveIndex(nextIndex);
-              }
-            }}
+            onClick={() => swiper?.slideNext()}
           >
             Next
           </Button>
