@@ -5,12 +5,32 @@ emerging markets for verified recyclable material drop-offs. Collectors submit
 collections and track earnings; collection points verify deliveries and manage
 inventory; administrators review fraud signals and platform activity.
 
-It is built mobile-first and offline-first, because the people using it are
-often on a low-end Android phone with intermittent connectivity. A collection
-submitted with no signal is queued locally and synced when the network returns.
+It is built mobile-first, because the people using it are often on a low-end
+Android phone with intermittent connectivity.
 
 Talks to [wastefi-backend](https://github.com/WASTEFI-AFRICA/wastefi-backend)
-over HTTP.
+over HTTP. Approved collections are recorded and paid on the
+[WasteFi contracts](https://github.com/WASTEFI-AFRICA/wastefi-contracts) on
+Stellar testnet.
+
+## Try it
+
+The whole flow runs live on Stellar testnet, nothing to install:
+
+1. Open [wastefi-frontend.vercel.app/login](https://wastefi-frontend.vercel.app/login)
+   and press **Use** next to the collection point demo account. The password is on
+   that page.
+2. Approve a collection in the queue. Within a minute or two it is recorded,
+   verified and paid in WASTE on Stellar, with a link to each transaction on
+   stellar.expert.
+3. Sign in as the demo collector to see the WASTE balance, read from the token
+   contract. Or create your own account, submit a collection, and approve it as the
+   collection point.
+4. [The public stats page](https://wastefi-frontend.vercel.app/stats) needs no
+   account and links every payment on-chain.
+
+The API runs on a free host that sleeps when idle, so the first request can take up
+to a minute.
 
 ## Stack
 
@@ -40,11 +60,15 @@ numbers, the collection points, and the smart contracts on testnet.
 
 ## What is real and what is sample data
 
-Only `/stats` is connected to the backend. The screens behind sign-in (dashboard,
-wallet, collections, profile, and the collection-point and admin screens) render
-hard-coded sample data, and each shows a notice saying so. The sign-in form is a
-demo: it signs in a placeholder user without calling the API, although the API's own
-login is real and tested. Connecting those screens is the main piece of remaining work.
+Connected to the API: sign-in and registration, the collector dashboard, collection
+history and submission (`/dashboard`, `/collections`, `/submit`), the collection
+point's verification queue (`/verify`), and the public `/stats` page. The other
+screens (wallet, profile, achievements, the collection point's analytics and
+inventory, and the admin screens) still render sample data, and each shows a notice
+saying so.
+
+Photo upload is not connected yet (see the open issues), and submitting needs a
+connection: the offline queue described below is not wired to the API.
 
 ## Offline behaviour
 
@@ -52,10 +76,12 @@ The offline path is the part of this app most likely to surprise you, so it is
 worth reading [docs/OFFLINE_ARCHITECTURE.md](docs/OFFLINE_ARCHITECTURE.md)
 before changing anything under `lib/db/` or `lib/sync/`.
 
-In short: writes go to an IndexedDB queue first and are replayed by
+The design: writes go to an IndexedDB queue first and are replayed by
 `lib/sync/syncManager.ts` when connectivity returns. That means a submission can
 exist locally but not yet on the server, and the UI has to represent that state
-honestly rather than pretending the write succeeded.
+honestly rather than pretending the write succeeded. The submit form does not use
+the queue yet, because the sync manager still posts to an endpoint the API does not
+have; it asks the user to reconnect instead.
 
 ## Local development
 
@@ -69,7 +95,9 @@ npm run dev
 
 The app runs at `http://localhost:3000`. It expects the backend at
 `NEXT_PUBLIC_API_URL`; without one reachable, pages that fetch data will show
-their error states.
+their error states. Set `NEXT_PUBLIC_DEMO_PASSWORD` to the backend's
+`DEMO_ACCOUNT_PASSWORD` to show the demo accounts on the sign-in page; both are
+baked in at build time, so a deployment needs a rebuild after changing them.
 
 ## Checks
 
