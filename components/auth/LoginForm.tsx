@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { homePath, login, safeNextPath } from "@/lib/api/auth";
+import { DemoAccounts } from "./DemoAccounts";
 import { Phone, Lock } from "lucide-react";
 
 /**
@@ -46,6 +47,7 @@ export function LoginForm() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -78,6 +80,13 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <DemoAccounts
+            onUse={(phone, password) => {
+              setValue("phone", phone, { shouldValidate: true });
+              setValue("password", password, { shouldValidate: true });
+            }}
+          />
+
           {error && (
             <div
               role="alert"
