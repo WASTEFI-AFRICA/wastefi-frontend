@@ -109,6 +109,20 @@ export function wasteAmount(baseUnits: string | null): number | null {
   return Number(BigInt(baseUnits)) / 10_000_000;
 }
 
+export interface NewCollection {
+  collectionPointId: string;
+  materialType: string;
+  materialCategory: string;
+  weight: number;
+  notes?: string;
+}
+
+/** Record a collection for the signed-in collector. It starts waiting for review. */
+export async function submitCollection(collection: NewCollection): Promise<ApiCollection> {
+  const body = await api.post<{ data: ApiCollection }>("/collections", collection);
+  return body.data;
+}
+
 /** The signed-in collector's own collections, newest first. */
 export async function listMyCollections(limit = 50): Promise<ApiCollection[]> {
   const body = await api.get<{ data: ApiCollection[] }>("/collections/me", { params: { limit } });

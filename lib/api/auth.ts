@@ -67,8 +67,11 @@ function describe(error: unknown, fallback: string): string {
     if (!error.response) {
       return "Could not reach the server. Check your connection and try again.";
     }
-    const body = error.response.data as { message?: string; error?: string } | undefined;
-    return body?.message || body?.error || fallback;
+    const body = error.response.data as
+      | { message?: string; error?: string; details?: Array<{ msg?: string }> }
+      | undefined;
+    // Validation errors carry the useful text per field, under details
+    return body?.details?.[0]?.msg || body?.message || body?.error || fallback;
   }
   return fallback;
 }
@@ -84,6 +87,32 @@ export async function login(phoneNumber: string, password: string): Promise<Sess
   } catch (error) {
     throw new Error(describe(error, "Sign-in failed. Check your phone number and password."));
   }
+}
+
+export interface Registration {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  email?: string;
+  password: string;
+}
+
+/** Create a collector account. Signing in is a separate step. */
+export async function registerAccount(registration: Registration): Promise<void> {
+  try {
+    await axios.post(
+      `${API_BASE_URL}/auth/register`,
+      { ...registration, email: registration.email || undefined },
+      { timeout: AUTH_TIMEOUT_MS }
+    );
+  } catch (error) {
+    throw new Error(describe(error, "The account could not be created. Please try again."));
+  }
+}
+
+/** True when sign-in failed only because the account is waiting for activation. */
+export function isAwaitingActivation(message: string): boolean {
+  return /not active/i.test(message);
 }
 
 /** Exchange a refresh token for a new session. Throws if the session has ended. */

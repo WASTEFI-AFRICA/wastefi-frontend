@@ -68,5 +68,24 @@ export async function fetchCollectionPoints(signal?: AbortSignal): Promise<Publi
   return Array.isArray(data) ? data : (data.collectionPoints ?? []);
 }
 
+export interface MaterialPrice {
+  /** The code the API uses, for example PET or ALUMINUM. */
+  materialType: string;
+  category: string;
+  description: string;
+  pricePerKg: number;
+}
+
+/** The materials the API accepts and what it pays for each. */
+export async function fetchMaterials(
+  signal?: AbortSignal
+): Promise<{ currency: string; materials: MaterialPrice[] }> {
+  const body = await getJson<{ data: { currency: string; materials: MaterialPrice[] } }>(
+    `${API_BASE_URL}/public/materials`,
+    signal
+  );
+  return body.data;
+}
+
 export const PUBLIC_STATS_URL = `${API_BASE_URL}/public/stats`;
 export const HEALTH_URL = `${API_ORIGIN}/health`;
