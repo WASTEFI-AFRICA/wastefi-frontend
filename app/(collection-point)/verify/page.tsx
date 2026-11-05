@@ -181,6 +181,10 @@ export default function VerificationPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Approved just now</CardTitle>
+              <p className="text-sm text-[var(--muted-foreground)]">
+                Each approval is recorded, verified and paid on Stellar. On testnet this
+                usually takes one to two minutes.
+              </p>
             </CardHeader>
             <CardContent className="divide-y divide-[var(--border)] p-0">
               {approved.map((collection) => (

@@ -1,11 +1,16 @@
 "use client";
 
 import { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { TopBar } from "@/components/navigation/TopBar";
 import { BottomNav } from "@/components/navigation/BottomNav";
 import { Sidebar } from "@/components/navigation/Sidebar";
 import { SampleDataNotice } from "@/components/layout/SampleDataNotice";
 import { RequireAuth } from "@/components/auth/RequireAuth";
+
+// Screens in this group that read real data from the API. The rest still show
+// sample figures and keep the notice until they are moved over.
+const LIVE_SCREENS = ["/dashboard", "/collections"];
 
 /**
  * Collector Layout
@@ -14,6 +19,8 @@ import { RequireAuth } from "@/components/auth/RequireAuth";
  */
 
 export default function CollectorLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+
   return (
     <RequireAuth allow={["collector"]}>
       <div className="min-h-screen bg-[var(--background)]">
@@ -25,7 +32,7 @@ export default function CollectorLayout({ children }: { children: ReactNode }) {
           <div className="flex-1 flex flex-col min-h-screen">
             {/* Top Bar */}
             <TopBar />
-            <SampleDataNotice />
+            {!LIVE_SCREENS.includes(pathname) && <SampleDataNotice />}
 
             {/* Page Content */}
             <main className="flex-1 pb-20 md:pb-6">{children}</main>

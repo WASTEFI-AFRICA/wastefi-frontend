@@ -108,3 +108,17 @@ export function wasteAmount(baseUnits: string | null): number | null {
   if (!baseUnits) return null;
   return Number(BigInt(baseUnits)) / 10_000_000;
 }
+
+/** The signed-in collector's own collections, newest first. */
+export async function listMyCollections(limit = 50): Promise<ApiCollection[]> {
+  const body = await api.get<{ data: ApiCollection[] }>("/collections/me", { params: { limit } });
+  return body.data;
+}
+
+/** Where a collection stands from the collector's side. */
+export type ReviewState = "pending" | "approved" | "rejected";
+
+export function reviewState(collection: ApiCollection): ReviewState {
+  if (!collection.verifiedAt) return "pending";
+  return collection.paymentStatus === "CANCELLED" ? "rejected" : "approved";
+}

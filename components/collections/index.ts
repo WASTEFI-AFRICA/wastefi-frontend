@@ -8,3 +8,4 @@ export { CollectionCard } from "./CollectionCard";
 export { CollectionFilter } from "./CollectionFilter";
 export { CollectionTimeline } from "./CollectionTimeline";
 export { CollectionDetail } from "./CollectionDetail";
+export { MyCollectionList } from "./MyCollectionList";
