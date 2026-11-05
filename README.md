@@ -18,8 +18,7 @@ Stellar testnet.
 The whole flow runs live on Stellar testnet, nothing to install:
 
 1. Open [wastefi-frontend.vercel.app/login](https://wastefi-frontend.vercel.app/login)
-   and press **Use** next to the collection point demo account. The password is on
-   that page.
+   and press **Sign in** next to the collection point demo account.
 2. Approve a collection in the queue. Within a minute or two it is recorded,
    verified and paid in WASTE on Stellar, with a link to each transaction on
    stellar.expert.

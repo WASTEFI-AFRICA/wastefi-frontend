@@ -25,7 +25,15 @@ const ACCOUNTS = [
   },
 ];
 
-export function DemoAccounts({ onUse }: { onUse: (phone: string, password: string) => void }) {
+export function DemoAccounts({
+  onUse,
+  busy = false,
+}: {
+  /** Sign in with these credentials. */
+  onUse: (phone: string, password: string) => void;
+  /** True while a sign-in is in progress; the buttons are disabled. */
+  busy?: boolean;
+}) {
   if (!DEMO_PASSWORD) return null;
   const password = DEMO_PASSWORD;
 
@@ -49,10 +57,11 @@ export function DemoAccounts({ onUse }: { onUse: (phone: string, password: strin
             <button
               type="button"
               onClick={() => onUse(account.phone, password)}
-              className="flex-shrink-0 rounded-md border border-[var(--primary)] px-3 py-1 text-[var(--primary)] hover:bg-[var(--primary)]/10"
-              aria-label={`Fill in the ${account.role.toLowerCase()} demo account`}
+              disabled={busy}
+              className="flex-shrink-0 rounded-md bg-[var(--primary)] px-3 py-1.5 font-medium text-white hover:bg-[var(--primary)]/90 disabled:opacity-60"
+              aria-label={`Sign in as the ${account.role.toLowerCase()} demo account`}
             >
-              Use
+              Sign in
             </button>
           </li>
         ))}

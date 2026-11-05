@@ -81,9 +81,12 @@ export function LoginForm() {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <DemoAccounts
+            busy={isLoading}
             onUse={(phone, password) => {
+              // Fill the form so the user sees which account is signing in, then sign in.
               setValue("phone", phone, { shouldValidate: true });
               setValue("password", password, { shouldValidate: true });
+              void handleSubmit(onSubmit)();
             }}
           />
 
