@@ -29,8 +29,9 @@ import {
  * Public stats
  *
  * Readable without an account, so anyone evaluating WasteFi can see what actually
- * runs. Everything in the first three sections is fetched live from the deployed
- * API when the page opens and every 30 seconds after; nothing here is mock data.
+ * runs. Every figure is fetched live from the deployed API when the page opens
+ * and every 30 seconds after; nothing here is mock data. The "What is live" list at
+ * the bottom is maintained by hand: update it when a screen moves onto the API.
  */
 
 const REFRESH_MS = 30_000;
@@ -447,9 +448,18 @@ export default function PublicStatsPage() {
                       the raw stats JSON this page reads
                     </a>
                   </li>
-                  <li>Registration, admin approval, role checks and recording a collection</li>
-                  <li>Payout calculation from the material price list</li>
-                  <li>The seven smart contracts above</li>
+                  <li>
+                    Sign-up and sign-in, submitting a collection, and the collection point&apos;s
+                    verification queue
+                  </li>
+                  <li>
+                    Approving a collection records it, verifies it and pays the collector in WASTE
+                    on Stellar testnet, through the seven contracts above
+                  </li>
+                  <li>
+                    The collector&apos;s dashboard and history, with the WASTE balance read from the
+                    token contract and a link to every transaction
+                  </li>
                   <li>
                     Automated test suites for the contracts and the backend, run on every push (see the{" "}
                     <a
@@ -468,11 +478,16 @@ export default function PublicStatsPage() {
                 <h3 className="font-semibold text-orange-700 mb-2">Not connected yet</h3>
                 <ul className="list-disc pl-5 space-y-1.5">
                   <li>
-                    The app screens after sign-in (dashboard, wallet, collections, profile) show{" "}
-                    <strong>sample data</strong>, not your account
+                    Some screens still show <strong>sample data</strong>: the wallet, profile and
+                    achievements, the collection point&apos;s analytics and inventory, and the admin
+                    screens. Each one says so.
                   </li>
-                  <li>The sign-in form in this web app is a demo; the API login behind it is real</li>
-                  <li>Mobile-money payouts, SMS verification, and the link between the API and the contracts</li>
+                  <li>Photo upload when submitting a collection</li>
+                  <li>Mobile-money cash-out (M-Pesa, MTN, Airtel) and SMS phone verification</li>
+                  <li>
+                    On this demo, new accounts are active at once instead of being verified first,
+                    and collector wallets are custodial testnet wallets
+                  </li>
                 </ul>
               </div>
             </CardContent>
