@@ -27,7 +27,17 @@ export interface PublicStats {
     weightKg: number;
     city: string;
     verifiedAt: string;
+    /** The Stellar transaction that paid it, once it has been paid on-chain. */
+    onChainTxHash: string | null;
   }>;
+  /** Collections recorded and paid on the Soroban contracts. */
+  onChain?: {
+    network: string;
+    explorerUrl: string;
+    collectionsPaid: number;
+    /** WASTE minted to collectors, in whole tokens. */
+    wasteMinted: number;
+  };
 }
 
 export interface HealthStatus {

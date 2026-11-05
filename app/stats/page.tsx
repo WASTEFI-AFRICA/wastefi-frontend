@@ -22,6 +22,7 @@ import {
   DEPLOYED_CONTRACTS,
   accountExplorerUrl,
   contractExplorerUrl,
+  txExplorerUrl,
 } from "@/lib/contracts";
 
 /**
@@ -116,6 +117,7 @@ export default function PublicStatsPage() {
   const apiUp = !error && health?.status === "ok";
   const dbUp = health?.database === "connected";
   const maxWeight = Math.max(1, ...(stats?.byMaterial.map((m) => m.weightKg) ?? [1]));
+  const wasteToken = DEPLOYED_CONTRACTS.find((c) => c.key === "waste_token");
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
@@ -198,11 +200,10 @@ export default function PublicStatsPage() {
             role="note"
             className="mb-4 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800"
           >
-            <strong>Demo dataset.</strong> WasteFi has no field users yet. Most of the figures
-            below come from four accounts named &ldquo;Demo Collector&rdquo; and their
-            collections, created through the real API to exercise the system for evaluation.
-            The calculations, approval checks and storage are real; the activity is not
-            organic.
+            <strong>Demo deployment.</strong> WasteFi has no field users yet. The collections
+            here come from a demo collector account and from people trying the demo. Nothing
+            is created already verified: every verified collection was approved through the
+            app and recorded on Stellar testnet, and its payment is linked below.
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
             <StatCard
@@ -232,6 +233,46 @@ export default function PublicStatsPage() {
               label="Collection points"
               value={stats ? whole.format(stats.totals.activeCollectionPoints) : "-"}
             />
+          </div>
+        </section>
+
+        {/* On-chain record */}
+        <section aria-label="On Stellar">
+          <h2 className="text-xl font-semibold mb-3">On Stellar</h2>
+          <p className="text-sm text-[var(--muted-foreground)] mb-4">
+            Each approved collection is recorded and verified in the WasteFi contracts, and the
+            collector is paid in WASTE, a token minted by the payment contract. These numbers
+            come from the API&apos;s record of those transactions; every one can be checked on
+            stellar.expert.
+          </p>
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            <StatCard
+              loading={loading && !stats}
+              label="Collections paid on-chain"
+              value={stats?.onChain ? whole.format(stats.onChain.collectionsPaid) : "-"}
+            />
+            <StatCard
+              loading={loading && !stats}
+              label="WASTE minted to collectors"
+              value={stats?.onChain ? number.format(stats.onChain.wasteMinted) : "-"}
+            />
+            {wasteToken && (
+              <Card className="col-span-2 lg:col-span-1">
+                <CardContent className="p-5">
+                  <p className="text-sm text-[var(--muted-foreground)]">WASTE token contract</p>
+                  <a
+                    href={contractExplorerUrl(wasteToken.address)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex items-center gap-1 font-mono text-sm text-[var(--primary)] underline underline-offset-4"
+                  >
+                    {shortAddress(wasteToken.address)}
+                    <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                  </a>
+                  <p className="text-xs text-[var(--muted-foreground)] mt-1">{CONTRACT_NETWORK}</p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </section>
 
@@ -281,12 +322,25 @@ export default function PublicStatsPage() {
               {stats && stats.recentVerified.length > 0 ? (
                 <ul className="divide-y divide-[var(--border)]">
                   {stats.recentVerified.map((item, index) => (
-                    <li key={index} className="py-2.5 flex justify-between text-sm">
+                    <li key={index} className="py-2.5 flex justify-between gap-3 text-sm">
                       <span>
                         <span className="font-medium">{number.format(item.weightKg)} kg</span>{" "}
                         {item.materialType}
+                        {item.onChainTxHash ? (
+                          <a
+                            href={txExplorerUrl(item.onChainTxHash)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-2 inline-flex items-center gap-1 text-[var(--primary)] underline underline-offset-4"
+                          >
+                            paid on Stellar
+                            <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                          </a>
+                        ) : (
+                          <span className="ml-2 text-[var(--muted-foreground)]">payment pending</span>
+                        )}
                       </span>
-                      <span className="text-[var(--muted-foreground)]">
+                      <span className="text-[var(--muted-foreground)] text-right">
                         {item.city} &middot; {timeAgo(item.verifiedAt)}
                       </span>
                     </li>
