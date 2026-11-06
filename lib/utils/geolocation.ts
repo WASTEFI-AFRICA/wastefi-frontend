@@ -83,8 +83,9 @@ export function formatDistance(km: number): string {
  * Get directions URL (Google Maps)
  */
 export function getDirectionsUrl(
-  from: Coordinates,
+  from: Coordinates | null,
   to: Coordinates
 ): string {
-  return `https://www.google.com/maps/dir/?api=1&origin=${from.lat},${from.lng}&destination=${to.lat},${to.lng}`;
+  const origin = from ? `&origin=${from.lat},${from.lng}` : "";
+  return `https://www.google.com/maps/dir/?api=1${origin}&destination=${to.lat},${to.lng}`;
 }

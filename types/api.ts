@@ -78,22 +78,19 @@ export interface CollectionPoint {
   id: string;
   name: string;
   address: string;
+  city: string;
+  country: string;
+  description?: string;
   location: {
     lat: number;
     lng: number;
-  };
-  acceptedMaterials: MaterialType[];
-  operatingHours: {
-    open: string;
-    close: string;
-    days: string[];
-  };
+  } | null;
+  acceptedMaterials: string[];
+  operatingHours: Array<{ day: string; hours: string }>;
   contact?: {
     phone?: string;
     email?: string;
   };
-  rating?: number;
-  totalCollections?: number;
   verified: boolean;
   createdAt: string;
 }

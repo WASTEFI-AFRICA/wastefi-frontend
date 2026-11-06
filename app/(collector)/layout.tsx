@@ -10,7 +10,7 @@ import { RequireAuth } from "@/components/auth/RequireAuth";
 
 // Screens in this group that read real data from the API. The rest still show
 // sample figures and keep the notice until they are moved over.
-const LIVE_SCREENS = ["/dashboard", "/collections", "/submit"];
+const LIVE_SCREENS = ["/dashboard", "/collections", "/submit", "/points"];
 
 /**
  * Collector Layout

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Search, Filter, X } from "lucide-react";
 import { Button, Badge } from "@/components/ui";
-import type { MaterialType } from "@/types/api";
+import { MaterialName } from "@/components/collections/MaterialName";
 
 /**
  * Collection Point Filter
@@ -12,27 +12,16 @@ import type { MaterialType } from "@/types/api";
 
 interface CollectionPointFilterProps {
   onSearchChange: (query: string) => void;
-  onMaterialFilter: (materials: MaterialType[]) => void;
-  selectedMaterials: MaterialType[];
+  onMaterialFilter: (materials: string[]) => void;
+  selectedMaterials: string[];
+  availableMaterials: string[];
 }
-
-const availableMaterials: MaterialType[] = [
-  "plastic",
-  "paper",
-  "metal",
-  "glass",
-  "e-waste",
-  "textiles",
-  "organic",
-  "cardboard",
-  "batteries",
-  "mixed",
-];
 
 export function CollectionPointFilter({
   onSearchChange,
   onMaterialFilter,
   selectedMaterials,
+  availableMaterials,
 }: CollectionPointFilterProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
@@ -42,7 +31,7 @@ export function CollectionPointFilter({
     onSearchChange(value);
   };
 
-  const toggleMaterial = (material: MaterialType) => {
+  const toggleMaterial = (material: string) => {
     const newSelection = selectedMaterials.includes(material)
       ? selectedMaterials.filter((m) => m !== material)
       : [...selectedMaterials, material];
@@ -60,18 +49,20 @@ export function CollectionPointFilter({
     <div className="space-y-3">
       {/* Search bar */}
       <div className="flex gap-2">
-        <div className="relative flex-1">
+        <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--muted-foreground)]" />
           <input
-            type="text"
+            type="search"
+            aria-label="Search collection points"
             placeholder="Search collection points..."
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="w-full h-12 pl-10 pr-4 rounded-md border border-[var(--border)] bg-[var(--background)] focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none"
+            className="w-full h-12 pl-10 pr-10 rounded-lg border border-[var(--border)] bg-[var(--card)] focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none"
           />
           {searchQuery && (
             <button
               onClick={() => handleSearchChange("")}
+              aria-label="Clear search"
               className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-[var(--muted)] rounded"
             >
               <X className="w-4 h-4" />
@@ -80,8 +71,13 @@ export function CollectionPointFilter({
         </div>
 
         <Button
-          variant={showFilters || selectedMaterials.length > 0 ? "primary" : "outline"}
-          size="lg"
+          variant={
+            showFilters || selectedMaterials.length > 0 ? "primary" : "outline"
+          }
+          size="icon"
+          className="h-12 w-12 shrink-0 rounded-lg"
+          aria-label="Filter materials"
+          aria-expanded={showFilters}
           onClick={() => setShowFilters(!showFilters)}
         >
           <Filter className="w-5 h-5" />
@@ -110,21 +106,25 @@ export function CollectionPointFilter({
             {availableMaterials.map((material) => {
               const isSelected = selectedMaterials.includes(material);
               return (
-                <Badge
+                <Button
                   key={material}
                   variant={isSelected ? "primary" : "outline"}
-                  size="md"
-                  className="cursor-pointer"
+                  size="sm"
+                  className="h-auto max-w-full whitespace-normal py-2 text-left"
+                  aria-pressed={isSelected}
                   onClick={() => toggleMaterial(material)}
                 >
-                  {material}
-                  {isSelected && (
-                    <X className="w-3 h-3 ml-1" />
-                  )}
-                </Badge>
+                  <MaterialName code={material} />
+                  {isSelected && <X className="w-3 h-3 ml-1" />}
+                </Button>
               );
             })}
           </div>
+          {availableMaterials.length === 0 && (
+            <p className="text-sm text-[var(--muted-foreground)]">
+              Materials have not been listed for these points.
+            </p>
+          )}
         </div>
       )}
 
@@ -139,6 +139,7 @@ export function CollectionPointFilter({
               &ldquo;{searchQuery}&rdquo;
               <button
                 onClick={() => handleSearchChange("")}
+                aria-label="Clear search filter"
                 className="ml-1"
               >
                 <X className="w-3 h-3" />
@@ -146,19 +147,16 @@ export function CollectionPointFilter({
             </Badge>
           )}
           {selectedMaterials.map((material) => (
-            <Badge
+            <Button
               key={material}
               variant="outline"
               size="sm"
+              onClick={() => toggleMaterial(material)}
+              className="h-auto max-w-full whitespace-normal py-1.5"
             >
-              {material}
-              <button
-                onClick={() => toggleMaterial(material)}
-                className="ml-1"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </Badge>
+              <MaterialName code={material} />
+              <X className="w-3 h-3 ml-1 shrink-0" aria-hidden="true" />
+            </Button>
           ))}
           <button
             onClick={clearFilters}

@@ -60,11 +60,11 @@ numbers, the collection points, and the smart contracts on testnet.
 ## What is real and what is sample data
 
 Connected to the API: sign-in and registration, the collector dashboard, collection
-history and submission (`/dashboard`, `/collections`, `/submit`), the collection
-point's verification queue (`/verify`), and the public `/stats` page. The other
-screens (wallet, profile, achievements, the collection point's analytics and
-inventory, and the admin screens) still render sample data, and each shows a notice
-saying so.
+history and submission (`/dashboard`, `/collections`, `/submit`), collection points
+(`/points`), the collection point's verification queue (`/verify`), and the public
+`/stats` page. Other screens, including wallet, profile, achievements, collection
+point analytics and inventory, and the admin screens, still render sample data.
+Each shows a notice saying so.
 
 Photo upload is not connected yet (see the open issues), and submitting needs a
 connection: the offline queue described below is not wired to the API.

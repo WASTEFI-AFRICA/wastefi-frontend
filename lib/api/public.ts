@@ -53,6 +53,16 @@ export interface PublicCollectionPoint {
   name: string;
   city: string;
   address: string;
+  country: string;
+  description: string | null;
+  latitude: number;
+  longitude: number;
+  contactPhone: string;
+  contactEmail: string | null;
+  operatingHours: string | null;
+  acceptedMaterials: string | null;
+  verifiedAt: string | null;
+  createdAt: string;
 }
 
 async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
@@ -73,9 +83,16 @@ export async function fetchHealth(signal?: AbortSignal): Promise<HealthStatus> {
 }
 
 export async function fetchCollectionPoints(signal?: AbortSignal): Promise<PublicCollectionPoint[]> {
-  const body = await getJson<{ data: unknown }>(`${API_BASE_URL}/collection-points`, signal);
-  const data = body.data as { collectionPoints?: PublicCollectionPoint[] } | PublicCollectionPoint[];
-  return Array.isArray(data) ? data : (data.collectionPoints ?? []);
+  const points: PublicCollectionPoint[] = [];
+  for (let page = 1; ; page += 1) {
+    const body = await getJson<{
+      data: PublicCollectionPoint[] | { collectionPoints: PublicCollectionPoint[] };
+      pagination?: { hasNextPage: boolean };
+    }>(`${API_BASE_URL}/collection-points?limit=100&page=${page}`, signal);
+    const batch = Array.isArray(body.data) ? body.data : body.data.collectionPoints;
+    points.push(...batch);
+    if (!body.pagination?.hasNextPage || batch.length === 0) return points;
+  }
 }
 
 export interface MaterialPrice {

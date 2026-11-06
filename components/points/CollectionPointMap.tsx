@@ -35,14 +35,15 @@ export function CollectionPointMap({
 
     // Initialize map
     const map = L.map(containerRef.current, {
-      center: userLocation || { lat: 0, lng: 0 },
-      zoom: userLocation ? 13 : 2,
+      center: { lat: 0, lng: 0 },
+      zoom: 2,
       zoomControl: true,
     });
 
     // Add tile layer
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 19,
     }).addTo(map);
 
@@ -63,7 +64,7 @@ export function CollectionPointMap({
         <div style="
           width: 20px;
           height: 20px;
-          background: #3b82f6;
+          background: #1f5fa8;
           border: 3px solid white;
           border-radius: 50%;
           box-shadow: 0 2px 4px rgba(0,0,0,0.3);
@@ -101,7 +102,11 @@ export function CollectionPointMap({
     currentMarkers.clear();
 
     // Add new markers
-    points.forEach((point) => {
+    const located = points.filter(
+      (point): point is CollectionPoint & { location: Coordinates } =>
+        point.location !== null,
+    );
+    located.forEach((point) => {
       const isSelected = selectedPoint?.id === point.id;
 
       const icon = L.divIcon({
@@ -109,7 +114,7 @@ export function CollectionPointMap({
           <div style="
             width: ${isSelected ? "40px" : "32px"};
             height: ${isSelected ? "40px" : "32px"};
-            background: ${isSelected ? "#10b981" : "#22c55e"};
+            background: ${isSelected ? "#145238" : "#1b6b4a"};
             border: ${isSelected ? "4px" : "3px"} solid white;
             border-radius: 50%;
             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
@@ -119,7 +124,7 @@ export function CollectionPointMap({
             font-size: ${isSelected ? "20px" : "16px"};
             transition: all 0.2s;
           ">
-            📍
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12s-8-7-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
           </div>
         `,
         className: "",
@@ -129,18 +134,19 @@ export function CollectionPointMap({
 
       const marker = L.marker([point.location.lat, point.location.lng], {
         icon,
+        title: point.name,
+        alt: point.name,
         zIndexOffset: isSelected ? 500 : 0,
       }).addTo(map);
 
-      marker.bindPopup(`
-        <div style="font-family: system-ui, sans-serif;">
-          <strong style="font-size: 14px;">${point.name}</strong>
-          <p style="margin: 4px 0; font-size: 12px; color: #666;">${point.address}</p>
-          <p style="margin: 4px 0; font-size: 11px; color: #10b981;">
-            ${point.operatingHours.open} - ${point.operatingHours.close}
-          </p>
-        </div>
-      `);
+      // Point names and addresses come from the API, so render them as text.
+      const popup = document.createElement("div");
+      const name = document.createElement("strong");
+      name.textContent = point.name;
+      const address = document.createElement("p");
+      address.textContent = `${point.address}, ${point.city}`;
+      popup.append(name, address);
+      marker.bindPopup(popup);
 
       if (onPointSelect) {
         marker.on("click", () => onPointSelect(point));
@@ -150,9 +156,9 @@ export function CollectionPointMap({
     });
 
     // Fit bounds to show all markers
-    if (points.length > 0) {
+    if (located.length > 0) {
       const bounds = L.latLngBounds(
-        points.map((p) => [p.location.lat, p.location.lng])
+        located.map((p) => [p.location.lat, p.location.lng]),
       );
       if (userLocation) {
         bounds.extend([userLocation.lat, userLocation.lng]);
@@ -164,8 +170,9 @@ export function CollectionPointMap({
   return (
     <div
       ref={containerRef}
-      className={`w-full rounded-lg overflow-hidden ${className}`}
-      style={{ height: "400px" }}
+      role="region"
+      aria-label="Collection point map"
+      className={`relative z-0 h-[420px] sm:h-[520px] w-full rounded-xl overflow-hidden border border-[var(--border)] ${className}`}
     />
   );
 }
