@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Bell, Recycle } from "lucide-react";
+import { Menu, Recycle } from "lucide-react";
 import { Button } from "@/components/ui";
 import { useUIStore } from "@/store/uiStore";
 import { SyncStatusBadge } from "@/components/offline/OfflineIndicator";
@@ -8,7 +8,7 @@ import { useStorageStats } from "@/lib/hooks/useOfflineStorage";
 
 /**
  * Top Bar
- * Header with logo, notifications, and menu toggle
+ * Header with logo, sync status, and menu toggle
  */
 
 interface TopBarProps {
@@ -45,23 +45,9 @@ export function TopBar({ title, showMenu = true }: TopBarProps) {
           </div>
         </div>
 
-        {/* Right: Sync Status + Notifications */}
-        <div className="flex items-center gap-2">
-          <SyncStatusBadge 
-            pendingCount={stats.pendingSubmissions + stats.syncQueueSize}
-          />
-          
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative"
-            aria-label="Notifications"
-          >
-            <Bell className="w-5 h-5" />
-            {/* Notification badge - will be dynamic later */}
-            <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--error)] rounded-full" />
-          </Button>
-        </div>
+        <SyncStatusBadge
+          pendingCount={stats.pendingSubmissions + stats.syncQueueSize}
+        />
       </div>
     </header>
   );
