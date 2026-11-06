@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { X, Check, XCircle, Package, Scale, MapPin, Camera, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, Button, Badge } from "@/components/ui";
 import { CollectionStatusBadge } from "@/components/collections/CollectionStatusBadge";
+import { MaterialName } from "@/components/collections/MaterialName";
 import type { WasteSubmission } from "@/types/api";
 
 /**
@@ -73,22 +74,23 @@ export function VerificationForm({
       <div className="w-full max-w-4xl bg-[var(--background)] rounded-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-[var(--background)] border-b border-[var(--border)] p-4 flex items-center justify-between z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[var(--primary)]/10 flex items-center justify-center">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="w-10 h-10 shrink-0 rounded-xl bg-[var(--accent)] flex items-center justify-center">
               <Package className="w-5 h-5 text-[var(--primary)]" />
             </div>
-            <div>
-              <h2 className="font-bold text-lg capitalize">
-                Verify {submission.materialType.replace("-", " ")} Collection
+            <div className="min-w-0">
+              <h2 className="font-bold text-lg">
+                Review collection
               </h2>
               <p className="text-sm text-[var(--muted-foreground)]">
-                ID: {submission.id.slice(0, 8)}
+                <MaterialName code={submission.materialDetail || submission.materialType} />
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-[var(--muted)] rounded-lg transition-colors"
+            aria-label="Close review"
+            className="shrink-0 p-2 hover:bg-[var(--muted)] rounded-lg transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
@@ -155,8 +157,8 @@ export function VerificationForm({
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between py-2 border-b border-[var(--border)]">
                   <span className="text-sm text-[var(--muted-foreground)]">Material</span>
-                  <Badge variant="outline" className="capitalize">
-                    {submission.materialType.replace("-", " ")}
+                  <Badge variant="outline" className="max-w-[70%] text-right">
+                    <MaterialName code={submission.materialDetail || submission.materialType} />
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b border-[var(--border)]">

@@ -5,6 +5,7 @@ import { Recycle } from "lucide-react";
 import { Badge } from "@/components/ui";
 import { ChainProgress } from "@/components/verification/ChainProgress";
 import { reviewState, type ApiCollection } from "@/lib/api/collections";
+import { MaterialName } from "./MaterialName";
 
 /**
  * A collector's own collections: what was delivered, whether it has been reviewed,
@@ -41,23 +42,25 @@ export function MyCollectionList({
       {collections.map((collection) => {
         const review = REVIEW[reviewState(collection)];
         return (
-          <li key={collection.id} className="py-3 space-y-2">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-full bg-[var(--primary)]/10 flex items-center justify-center flex-shrink-0">
+          <li key={collection.id} className="py-4 space-y-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-[var(--accent)] flex items-center justify-center flex-shrink-0">
                   <Recycle className="w-5 h-5 text-[var(--primary)]" aria-hidden="true" />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-medium">
-                    {collection.weight} kg {collection.materialType}
+                  <p className="font-semibold break-words">
+                    <MaterialName code={collection.materialType} />
                   </p>
-                  <p className="text-sm text-[var(--muted-foreground)] truncate">
-                    {collection.collectionPoint?.name ?? "Collection point"} ·{" "}
+                  <p className="text-sm text-[var(--muted-foreground)]">
+                    {collection.weight} kg · {collection.collectionPoint?.name ?? "Collection point"}
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--muted-foreground)]">
                     {format(new Date(collection.createdAt), "d MMM yyyy")}
                   </p>
                 </div>
               </div>
-              <div className="text-right flex-shrink-0 space-y-1">
+              <div className="flex items-center justify-between gap-3 border-t border-[var(--border)] pt-3 sm:block sm:border-0 sm:pt-0 sm:text-right sm:flex-shrink-0 sm:space-y-1">
                 <p className="font-semibold text-[var(--primary)]">
                   {collection.paymentCurrency} {collection.paymentAmount.toFixed(2)}
                 </p>
@@ -67,7 +70,7 @@ export function MyCollectionList({
               </div>
             </div>
             {collection.chainStatus && (
-              <div className="pl-13">
+              <div className="sm:pl-13">
                 <ChainProgress collection={collection} />
               </div>
             )}

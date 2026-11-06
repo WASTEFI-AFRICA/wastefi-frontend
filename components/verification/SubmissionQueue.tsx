@@ -2,8 +2,9 @@
 
 import { format } from "date-fns";
 import { Package, Eye, CheckSquare } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from "@/components/ui";
+import { Card, CardContent, CardHeader, CardTitle, Button } from "@/components/ui";
 import { CollectionStatusBadge } from "@/components/collections/CollectionStatusBadge";
+import { MaterialName } from "@/components/collections/MaterialName";
 import type { WasteSubmission } from "@/types/api";
 
 /**
@@ -45,7 +46,7 @@ export function SubmissionQueue({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             <Package className="w-5 h-5" />
             Pending Verification ({submissions.length})
@@ -70,34 +71,29 @@ export function SubmissionQueue({
                     isSelected ? "bg-[var(--primary)]/5" : ""
                   }`}
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-3 sm:gap-4">
                     {/* Checkbox */}
                     {onBulkSelect && (
                       <input
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => handleSelectOne(submission.id)}
+                        aria-label={`Select collection from ${submission.collectorName || "collector"}`}
                         className="mt-1 w-4 h-4 rounded border-[var(--border)] text-[var(--primary)] focus:ring-[var(--primary)]"
                       />
                     )}
 
                     {/* Icon */}
-                    <div className="w-12 h-12 rounded-lg bg-[var(--primary)]/10 flex items-center justify-center flex-shrink-0">
+                    <div className="hidden w-12 h-12 rounded-xl bg-[var(--accent)] sm:flex items-center justify-center flex-shrink-0">
                       <Package className="w-6 h-6 text-[var(--primary)]" />
                     </div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div>
-                          <h4 className="font-semibold capitalize">
-                            {submission.materialType.replace("-", " ")}
-                            {submission.materialDetail && (
-                              <span className="font-normal text-[var(--muted-foreground)] normal-case">
-                                {" "}
-                                · {submission.materialDetail}
-                              </span>
-                            )}
+                      <div className="flex flex-col items-start gap-2 mb-3 sm:flex-row sm:justify-between">
+                        <div className="min-w-0">
+                          <h4 className="font-semibold break-words">
+                            <MaterialName code={submission.materialDetail || submission.materialType} />
                           </h4>
                           <p className="text-sm text-[var(--muted-foreground)]">
                             {[submission.collectorName, submission.collectionPointName]

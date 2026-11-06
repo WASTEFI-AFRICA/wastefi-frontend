@@ -22,6 +22,7 @@ import {
   type ApiCollection,
 } from "@/lib/api/collections";
 import type { WasteSubmission } from "@/types/api";
+import { MaterialName } from "@/components/collections/MaterialName";
 
 /**
  * Verification Page
@@ -189,15 +190,13 @@ export default function VerificationPage() {
             <CardContent className="divide-y divide-[var(--border)] p-0">
               {approved.map((collection) => (
                 <div key={collection.id} className="p-4 space-y-2">
-                  <p className="text-sm">
-                    <span className="font-medium">
-                      {collection.weight} kg {collection.materialType}
-                    </span>
+                  <p className="font-semibold">
+                    <MaterialName code={collection.materialType} />
+                  </p>
+                  <p className="text-sm text-[var(--muted-foreground)]">
+                    {collection.weight} kg
                     {collection.collector && (
-                      <span className="text-[var(--muted-foreground)]">
-                        {" "}
-                        from {collection.collector.firstName} {collection.collector.lastName}
-                      </span>
+                      <> · {collection.collector.firstName} {collection.collector.lastName}</>
                     )}
                   </p>
                   <ChainProgress collection={collection} />
