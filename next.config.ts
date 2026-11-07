@@ -12,6 +12,12 @@ export default withPWA({
   disable: process.env.NODE_ENV === "development",
   runtimeCaching: [
     {
+      // These authenticated wallet reads must never fall back to another visit's cache.
+      urlPattern: /^https?:\/\/[^/]+\/api\/v1\/(?:wallet\/waste|collections\/me)(?:\?.*)?$/i,
+      handler: "NetworkOnly",
+      method: "GET",
+    },
+    {
       urlPattern: /^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,
       handler: "CacheFirst",
       options: {

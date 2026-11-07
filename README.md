@@ -61,8 +61,12 @@ numbers, the collection points, and the smart contracts on testnet.
 
 Connected to the API: sign-in and registration, the collector dashboard, collection
 history and submission (`/dashboard`, `/collections`, `/submit`), collection points
-(`/points`), the collection point's verification queue (`/verify`), and the public
-`/stats` page. Other screens, including wallet, profile, achievements, collection
+(`/points`), the wallet (`/wallet`), the collection point's verification queue
+(`/verify`), and the public `/stats` page. The wallet reads the WASTE balance from
+the token contract through the API and loads every collection history page for
+completed rewards. WASTE is on Stellar testnet; cash-out is not available.
+Wallet balance and history reads use the network without an offline cache fallback.
+Other screens, including profile, achievements, collection
 point analytics and inventory, and the admin screens, still render sample data.
 Each shows a notice saying so.
 
