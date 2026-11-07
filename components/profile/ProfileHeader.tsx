@@ -1,75 +1,53 @@
-"use client";
+import { UserRound } from "lucide-react";
+import type { CollectorProfile } from "@/lib/api/profile";
 
-import { Camera, Edit2 } from "lucide-react";
-import { Button, Badge } from "@/components/ui";
-import type { User } from "@/types/api";
+const roles = {
+  COLLECTOR: "Collector",
+  COLLECTION_POINT: "Collection point",
+  VERIFIER: "Verifier",
+  ADMIN: "Admin",
+};
 
-/**
- * Profile Header
- * Display user avatar, name, and basic info
- */
-
-interface ProfileHeaderProps {
-  user: User;
-  onEdit?: () => void;
-  onAvatarChange?: () => void;
-}
-
-export function ProfileHeader({ user, onEdit, onAvatarChange }: ProfileHeaderProps) {
-  // Get initials from name
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
+export function ProfileHeader({ profile }: { profile: CollectorProfile }) {
+  const initials =
+    `${profile.firstName.trim()[0] ?? ""}${profile.lastName.trim()[0] ?? ""}`.toUpperCase();
+  const name = `${profile.firstName} ${profile.lastName}`.trim();
+  const status = profile.status[0] + profile.status.slice(1).toLowerCase();
 
   return (
-    <div className="relative">
-      {/* Cover gradient */}
-      <div className="h-32 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] rounded-t-xl" />
-
-      {/* Profile content */}
-      <div className="px-6 pb-6">
-        {/* Avatar */}
-        <div className="relative -mt-16 mb-4">
-          <div className="w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center text-2xl font-bold text-[var(--primary)] border-4 border-white">
-            {getInitials(user.name)}
-          </div>
-          {onAvatarChange && (
-            <button
-              onClick={onAvatarChange}
-              className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[var(--primary)] text-white flex items-center justify-center shadow-lg hover:bg-[var(--primary-dark)] transition-colors"
-            >
-              <Camera className="w-4 h-4" />
-            </button>
-          )}
+    <section
+      aria-labelledby="profile-name"
+      className="relative min-w-0 overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] p-6 text-white sm:p-8"
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-12 -top-24 h-64 w-64 rounded-full border-[32px] border-white opacity-10"
+      />
+      <div className="relative flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+        <div
+          aria-hidden="true"
+          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[var(--accent)] text-xl font-semibold text-[var(--primary-dark)]"
+        >
+          {initials || <UserRound className="h-7 w-7" />}
         </div>
-
-        {/* User info */}
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h2 className="text-2xl font-bold mb-1">{user.name}</h2>
-            <p className="text-[var(--muted-foreground)] mb-2">{user.phone}</p>
-            {user.email && (
-              <p className="text-sm text-[var(--muted-foreground)]">{user.email}</p>
-            )}
-          </div>
-          {onEdit && (
-            <Button variant="outline" size="sm" onClick={onEdit}>
-              <Edit2 className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-          )}
+        <div className="min-w-0 flex-1">
+          <p className="mb-1 text-xs font-medium uppercase tracking-widest text-white/80">
+            {roles[profile.role]} account
+          </p>
+          <h2
+            id="profile-name"
+            className="text-2xl font-semibold tracking-tight [overflow-wrap:anywhere] sm:text-3xl"
+          >
+            {name}
+          </h2>
+          <p className="mt-2 text-sm text-white/85 [overflow-wrap:anywhere]">
+            {profile.email || profile.phoneNumber}
+          </p>
         </div>
-
-        {/* Role badge */}
-        <Badge variant="primary" size="md">
-          {user.role === "collector" ? "Waste Collector" : user.role}
-        </Badge>
+        <span className="relative shrink-0 rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium">
+          Account {status.toLowerCase()}
+        </span>
       </div>
-    </div>
+    </section>
   );
 }

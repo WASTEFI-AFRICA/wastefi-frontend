@@ -9,7 +9,6 @@ import {
   User,
   MapPin,
   BarChart3,
-  Settings,
   LogOut,
   X,
 } from "lucide-react";
@@ -37,7 +36,6 @@ const collectorNavItems: NavItem[] = [
   { href: "/collections", label: "My Collections", icon: BarChart3 },
   { href: "/points", label: "Collection Points", icon: MapPin },
   { href: "/profile", label: "Profile", icon: User },
-  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -71,12 +69,12 @@ export function Sidebar() {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between h-16 px-4 border-b border-[var(--border)]">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-[var(--primary)] flex items-center justify-center text-white font-semibold">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="w-8 h-8 shrink-0 rounded-full bg-[var(--primary)] flex items-center justify-center text-white font-semibold">
                 {user?.name?.[0]?.toUpperCase() || "U"}
               </div>
-              <div>
-                <p className="font-medium text-sm">{user?.name || "User"}</p>
+              <div className="min-w-0">
+                <p className="truncate font-medium text-sm" title={user?.name || "User"}>{user?.name || "User"}</p>
                 <p className="text-xs text-[var(--muted-foreground)] capitalize">
                   {user?.role || "Collector"}
                 </p>
