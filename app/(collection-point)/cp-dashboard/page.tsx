@@ -1,210 +1,178 @@
 "use client";
 
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, ClipboardCheck, Globe2, RefreshCw } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { Section } from "@/components/layout/Section";
+import { Button, buttonVariants } from "@/components/ui/Button";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { DashboardMetrics } from "@/components/collection-point/DashboardMetrics";
+import { MaterialBreakdown } from "@/components/collection-point/MaterialBreakdown";
+import { ReviewQueuePreview } from "@/components/collection-point/ReviewQueuePreview";
+import { APIError } from "@/lib/api/client";
 import {
-  MetricCard,
-  ActivityFeed,
-  QuickActions,
-  CollectionChart,
-  TopCollectors,
-} from "@/components/collection-point";
-import { Package, Users, Scale, Clock, DollarSign, TrendingUp } from "lucide-react";
+  getCollectionStatistics,
+  getReviewQueuePreview,
+} from "@/lib/api/operator-dashboard";
+import { useAuthStore } from "@/store/authStore";
 
-/**
- * Collection Point Dashboard
- * Overview and analytics for collection point operators
- */
+const queryOptions = {
+  staleTime: 0,
+  gcTime: 0,
+  retry: false,
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false,
+} as const;
 
 export default function CollectionPointDashboard() {
-  // Mock metrics
-  const metrics = [
-    {
-      title: "Total Collections",
-      value: 324,
-      subtitle: "This month",
-      icon: Package,
-      trend: { value: 12, label: "vs last month" },
-      color: "var(--primary)",
-    },
-    {
-      title: "Active Collectors",
-      value: 47,
-      subtitle: "Registered users",
-      icon: Users,
-      trend: { value: 8, label: "vs last month" },
-      color: "var(--info)",
-    },
-    {
-      title: "Total Weight",
-      value: "1,234 kg",
-      subtitle: "This month",
-      icon: Scale,
-      trend: { value: 15, label: "vs last month" },
-      color: "var(--success)",
-    },
-    {
-      title: "Pending Reviews",
-      value: 12,
-      subtitle: "Awaiting verification",
-      icon: Clock,
-      trend: { value: -5, label: "vs yesterday" },
-      color: "var(--warning)",
-    },
-  ];
-
-  // Mock activities
-  const activities = [
-    {
-      id: "act-1",
-      type: "submission" as const,
-      collectorName: "John Doe",
-      materialType: "plastic",
-      weight: 5.5,
-      timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-      status: "pending" as const,
-    },
-    {
-      id: "act-2",
-      type: "verification" as const,
-      collectorName: "Jane Smith",
-      materialType: "cardboard",
-      weight: 12.3,
-      timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-      status: "verified" as const,
-    },
-    {
-      id: "act-3",
-      type: "submission" as const,
-      collectorName: "Mike Johnson",
-      materialType: "metal",
-      weight: 8.7,
-      timestamp: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-      status: "pending" as const,
-    },
-    {
-      id: "act-4",
-      type: "verification" as const,
-      collectorName: "Sarah Williams",
-      materialType: "glass",
-      weight: 15.2,
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      status: "verified" as const,
-    },
-    {
-      id: "act-5",
-      type: "rejection" as const,
-      collectorName: "Tom Brown",
-      materialType: "mixed",
-      weight: 3.4,
-      timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-      status: "rejected" as const,
-    },
-  ];
-
-  // Mock chart data - Collections by day
-  const dailyCollections = [
-    { label: "Monday", value: 45 },
-    { label: "Tuesday", value: 52 },
-    { label: "Wednesday", value: 48 },
-    { label: "Thursday", value: 61 },
-    { label: "Friday", value: 55 },
-    { label: "Saturday", value: 38 },
-    { label: "Sunday", value: 25 },
-  ];
-
-  // Mock chart data - Material types
-  const materialBreakdown = [
-    { label: "Plastic", value: 125 },
-    { label: "Paper", value: 98 },
-    { label: "Metal", value: 67 },
-    { label: "Glass", value: 45 },
-    { label: "E-waste", value: 34 },
-  ];
-
-  // Mock top collectors
-  const topCollectors = [
-    {
-      id: "col-1",
-      name: "Emma Johnson",
-      collections: 42,
-      weight: 156.8,
-    },
-    {
-      id: "col-2",
-      name: "Michael Chen",
-      collections: 38,
-      weight: 142.3,
-    },
-    {
-      id: "col-3",
-      name: "Sarah Williams",
-      collections: 35,
-      weight: 128.9,
-    },
-    {
-      id: "col-4",
-      name: "David Martinez",
-      collections: 31,
-      weight: 115.2,
-    },
-    {
-      id: "col-5",
-      name: "Lisa Anderson",
-      collections: 28,
-      weight: 98.5,
-    },
-  ];
+  const userId = useAuthStore((state) => state.user?.id);
+  const statistics = useQuery({
+    ...queryOptions,
+    queryKey: ["operator-dashboard", userId, "statistics"],
+    queryFn: ({ signal }) => getCollectionStatistics(signal),
+    enabled: Boolean(userId),
+  });
+  const queue = useQuery({
+    ...queryOptions,
+    queryKey: ["operator-dashboard", userId, "queue"],
+    queryFn: ({ signal }) => getReviewQueuePreview(signal),
+    enabled: Boolean(userId),
+  });
+  const refreshing = statistics.isFetching || queue.isFetching;
 
   return (
     <Container>
-      <Section>
+      <div className="space-y-6 py-6 sm:py-8">
         <PageHeader
-          title="Dashboard"
-          description="Collection point overview and analytics"
+          title="Collection dashboard"
+          description="Platform activity across all collection points."
+          actions={
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={refreshing}
+              onClick={() => {
+                void statistics.refetch();
+                void queue.refetch();
+              }}
+            >
+              <RefreshCw
+                className={`mr-2 h-4 w-4 ${refreshing ? "animate-spin motion-reduce:animate-none" : ""}`}
+                aria-hidden="true"
+              />
+              {refreshing ? "Refreshing…" : "Refresh dashboard"}
+            </Button>
+          }
         />
-      </Section>
 
-      <Section spacing="sm">
-        {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {metrics.map((metric, index) => (
-            <MetricCard
-              key={index}
-              title={metric.title}
-              value={metric.value}
-              subtitle={metric.subtitle}
-              icon={metric.icon}
-              trend={metric.trend}
-              color={metric.color}
-            />
-          ))}
+        <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--muted-foreground)]">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1.5">
+            <Globe2 className="h-3.5 w-3.5" aria-hidden="true" />
+            All collection points
+          </span>
+          <span className="rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1.5">
+            All time
+          </span>
         </div>
 
-        {/* Quick Actions */}
-        <QuickActions />
-
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <CollectionChart
-            title="Collections This Week"
-            data={dailyCollections}
-            color="var(--primary)"
+        <section
+          aria-labelledby="dashboard-queue-title"
+          aria-busy={queue.isPending}
+          className="relative min-w-0 overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] p-6 text-white sm:p-8"
+        >
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-12 -top-24 h-72 w-72 rounded-full border-[32px] border-white opacity-10"
           />
-          <CollectionChart
-            title="Material Breakdown"
-            data={materialBreakdown}
-            color="var(--success)"
-          />
-        </div>
+          <div className="relative flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="mb-3 flex items-center gap-2 text-sm text-white/85">
+                <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
+                <h2 id="dashboard-queue-title">
+                  {queue.isError && queue.data
+                    ? "Last loaded review queue"
+                    : "Awaiting review"}
+                </h2>
+              </div>
+              {queue.isPending ? (
+                <Skeleton className="my-3 h-12 w-32 bg-white/20" />
+              ) : (
+                <p className="text-4xl font-semibold tracking-tight [overflow-wrap:anywhere] sm:text-5xl">
+                  {queue.data
+                    ? queue.data.total.toLocaleString("en-US")
+                    : "Unavailable"}
+                </p>
+              )}
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/85">
+                {queue.data?.total === 0
+                  ? "The review queue is clear. New submissions will appear here."
+                  : "Review submitted deliveries so approved collections can continue to payment."}
+              </p>
+              {queue.isError ? (
+                <p
+                  role="status"
+                  className="mt-3 max-w-xl text-sm text-white/95"
+                >
+                  {queue.data
+                    ? "Could not refresh the queue. Showing the last successful snapshot."
+                    : "The queue could not be loaded. Use Refresh dashboard or open the verification queue."}
+                </p>
+              ) : null}
+            </div>
+            <Link
+              href="/verify"
+              className={buttonVariants({
+                variant: "cta",
+                className: "relative shrink-0 gap-2",
+              })}
+            >
+              Open verification queue
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+        </section>
 
-        {/* Bottom Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ActivityFeed activities={activities} />
-          <TopCollectors collectors={topCollectors} />
+        <section
+          aria-labelledby="dashboard-recorded-title"
+          className="space-y-4"
+        >
+          <div>
+            <h2 id="dashboard-recorded-title" className="font-semibold">
+              Recorded collections
+            </h2>
+            <p className="mt-1 text-sm text-[var(--muted-foreground)]">
+              These figures include collections at every review stage, including
+              rejected deliveries.
+            </p>
+          </div>
+          {statistics.isError ? (
+            <p
+              role="status"
+              className="rounded-xl border border-[var(--border)] bg-[var(--card)] px-5 py-4 text-sm"
+            >
+              {statistics.data
+                ? "Could not refresh statistics. Showing the last loaded totals and material breakdown."
+                : statistics.error instanceof APIError &&
+                    statistics.error.status === 403
+                  ? "Statistics are not available for this account. You can still use the verification queue."
+                  : "Statistics could not be loaded. Use Refresh dashboard to try again."}
+            </p>
+          ) : null}
+          <DashboardMetrics
+            statistics={statistics.data}
+            isLoading={statistics.isPending}
+          />
+        </section>
+
+        <div className="grid items-start gap-5 lg:grid-cols-2">
+          <MaterialBreakdown
+            materials={statistics.data?.byMaterial}
+            isLoading={statistics.isPending}
+          />
+          <ReviewQueuePreview queue={queue.data} isLoading={queue.isPending} />
         </div>
-      </Section>
+      </div>
     </Container>
   );
 }

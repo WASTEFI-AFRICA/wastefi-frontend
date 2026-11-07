@@ -13,7 +13,7 @@ export default withPWA({
   runtimeCaching: [
     {
       // Private account reads must never fall back to another visit's cache.
-      urlPattern: /^https?:\/\/[^/]+\/api\/v1\/(?:wallet\/waste|collections\/me|users\/me)(?:\?.*)?$/i,
+      urlPattern: /^https?:\/\/[^/]+\/api\/v1\/(?:wallet\/waste|collections(?:\/(?:me|statistics))?|users\/me)(?:\?.*)?$/i,
       handler: "NetworkOnly",
       method: "GET",
     },

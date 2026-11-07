@@ -8,7 +8,7 @@ import { StaffHeader } from "@/components/navigation/StaffHeader";
 
 // Screens in this group that read real data from the API. The rest still show
 // sample figures and keep the notice until they are moved over.
-const LIVE_SCREENS = ["/verify"];
+const LIVE_SCREENS = ["/verify", "/cp-dashboard"];
 
 export default function Layout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
