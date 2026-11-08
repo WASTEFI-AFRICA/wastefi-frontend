@@ -1,370 +1,350 @@
-'use client'
+"use client";
 
-import { Suspense, useState, useMemo } from 'react'
-import { UserPlus } from 'lucide-react'
-import { PageHeader } from '@/components/layout/PageHeader'
-import { Container } from '@/components/layout/Container'
-import { Button } from '@/components/ui/Button'
-import { Pagination } from '@/components/ui'
-import { usePagination } from '@/hooks/usePagination'
+import { useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
-  UserTable,
-  KycVerificationModal,
-  UserDetailModal,
-  KycQueue,
-} from '@/components/user-management'
+  ArrowLeft,
+  ArrowRight,
+  RefreshCw,
+  ShieldCheck,
+  UsersRound,
+} from "lucide-react";
+import { Container } from "@/components/layout/Container";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { AccountList } from "@/components/admin/AccountList";
+import { Button } from "@/components/ui/Button";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { APIError } from "@/lib/api/client";
+import {
+  activateUser,
+  getAdminUsers,
+  userRoles,
+  userStatuses,
+  type AdminUser,
+  type UserFilters,
+} from "@/lib/api/admin-users";
+import { useAuthStore } from "@/store/authStore";
 
-// Type definition
-type User = {
-  id: string
-  name: string
-  email: string
-  phone: string
-  role: 'collector' | 'collection_point' | 'admin'
-  status: 'active' | 'inactive' | 'suspended'
-  kycStatus: 'verified' | 'pending' | 'rejected' | 'not_submitted'
-  registeredAt: Date
-  lastActive: Date
-  stats?: {
-    totalSubmissions: number
-    totalWeight: number
-    totalEarnings: number
-    successRate: number
-  }
-  location?: string
-}
+export default function UsersPage() {
+  const userId = useAuthStore((state) => state.user?.id);
+  const [filters, setFilters] = useState<UserFilters>({
+    status: "PENDING",
+    role: "",
+    page: 1,
+  });
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [confirmedIds, setConfirmedIds] = useState<string[]>([]);
+  const [unconfirmedId, setUnconfirmedId] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ text: string; error: boolean } | null>(
+    null,
+  );
+  const busy = useRef(false);
+  const users = useQuery({
+    queryKey: ["admin-users", userId, filters],
+    queryFn: ({ signal }) => getAdminUsers(filters, signal),
+    enabled: Boolean(userId),
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+  const pagination = users.data?.pagination;
+  const page = pagination?.page ?? filters.page;
+  const disabled = pendingId !== null || users.isFetching;
+  const sameAccount = () => useAuthStore.getState().user?.id === userId;
 
-// Mock data
-const mockUsers: User[] = [
-  {
-    id: '1',
-    name: 'John Kamau',
-    email: 'john.kamau@example.com',
-    phone: '+254712345678',
-    role: 'collector' as const,
-    status: 'active' as const,
-    kycStatus: 'verified' as const,
-    registeredAt: new Date('2024-01-15'),
-    lastActive: new Date('2024-02-14'),
-    stats: {
-      totalSubmissions: 45,
-      totalWeight: 342.5,
-      totalEarnings: 1250.75,
-      successRate: 95,
-    },
-    location: 'Nairobi, Kenya',
-  },
-  {
-    id: '2',
-    name: 'Mary Wanjiku',
-    email: 'mary.w@example.com',
-    phone: '+254723456789',
-    role: 'collector' as const,
-    status: 'active' as const,
-    kycStatus: 'pending' as const,
-    registeredAt: new Date('2024-01-20'),
-    lastActive: new Date('2024-02-13'),
-    stats: {
-      totalSubmissions: 38,
-      totalWeight: 298.2,
-      totalEarnings: 1089.5,
-      successRate: 92,
-    },
-    location: 'Nairobi, Kenya',
-  },
-  {
-    id: '3',
-    name: 'Green Earth Recycling',
-    email: 'contact@greenearth.co.ke',
-    phone: '+254734567890',
-    role: 'collection_point' as const,
-    status: 'active' as const,
-    kycStatus: 'verified' as const,
-    registeredAt: new Date('2023-12-01'),
-    lastActive: new Date('2024-02-14'),
-    location: 'Westlands, Nairobi',
-  },
-  {
-    id: '4',
-    name: 'Peter Ochieng',
-    email: 'peter.o@example.com',
-    phone: '+254745678901',
-    role: 'collector' as const,
-    status: 'inactive' as const,
-    kycStatus: 'not_submitted' as const,
-    registeredAt: new Date('2024-02-01'),
-    lastActive: new Date('2024-02-05'),
-    stats: {
-      totalSubmissions: 12,
-      totalWeight: 89.3,
-      totalEarnings: 325.8,
-      successRate: 88,
-    },
-    location: 'Nairobi, Kenya',
-  },
-  {
-    id: '5',
-    name: 'Sarah Muthoni',
-    email: 'sarah.m@example.com',
-    phone: '+254756789012',
-    role: 'collector' as const,
-    status: 'suspended' as const,
-    kycStatus: 'rejected' as const,
-    registeredAt: new Date('2024-01-10'),
-    lastActive: new Date('2024-02-01'),
-    stats: {
-      totalSubmissions: 23,
-      totalWeight: 167.4,
-      totalEarnings: 612.3,
-      successRate: 78,
-    },
-    location: 'Nairobi, Kenya',
-  },
-  {
-    id: '6',
-    name: 'Admin User',
-    email: 'admin@wastefi.com',
-    phone: '+254767890123',
-    role: 'admin' as const,
-    status: 'active' as const,
-    kycStatus: 'verified' as const,
-    registeredAt: new Date('2023-11-01'),
-    lastActive: new Date('2024-02-14'),
-  },
-  {
-    id: '7',
-    name: 'EcoPoint Recyclers',
-    email: 'info@ecopoint.co.ke',
-    phone: '+254778901234',
-    role: 'collection_point' as const,
-    status: 'active' as const,
-    kycStatus: 'pending' as const,
-    registeredAt: new Date('2024-02-10'),
-    lastActive: new Date('2024-02-14'),
-    location: 'Karen, Nairobi',
-  },
-  {
-    id: '8',
-    name: 'James Kipchoge',
-    email: 'james.k@example.com',
-    phone: '+254789012345',
-    role: 'collector' as const,
-    status: 'active' as const,
-    kycStatus: 'verified' as const,
-    registeredAt: new Date('2024-01-25'),
-    lastActive: new Date('2024-02-14'),
-    stats: {
-      totalSubmissions: 31,
-      totalWeight: 234.1,
-      totalEarnings: 852.8,
-      successRate: 94,
-    },
-    location: 'Nairobi, Kenya',
-  },
-]
-
-const mockKycQueue = [
-  {
-    id: 'kyc1',
-    userId: '2',
-    userName: 'Mary Wanjiku',
-    userEmail: 'mary.w@example.com',
-    userPhone: '+254723456789',
-    submittedAt: new Date('2024-02-13'),
-    documentCount: 3,
-    priority: 'high' as const,
-  },
-  {
-    id: 'kyc2',
-    userId: '7',
-    userName: 'EcoPoint Recyclers',
-    userEmail: 'info@ecopoint.co.ke',
-    userPhone: '+254778901234',
-    submittedAt: new Date('2024-02-12'),
-    documentCount: 4,
-    priority: 'normal' as const,
-  },
-]
-
-const mockKycDocuments = [
-  {
-    type: 'id_card' as const,
-    url: '/docs/id-card.jpg',
-    uploadedAt: new Date('2024-02-13'),
-    status: 'pending' as const,
-  },
-  {
-    type: 'selfie' as const,
-    url: '/docs/selfie.jpg',
-    uploadedAt: new Date('2024-02-13'),
-    status: 'pending' as const,
-  },
-  {
-    type: 'proof_of_address' as const,
-    url: '/docs/proof-address.pdf',
-    uploadedAt: new Date('2024-02-13'),
-    status: 'pending' as const,
-  },
-]
-
-function UsersPageContent() {
-  const [users, setUsers] = useState(mockUsers)
-  const [kycQueue, setKycQueue] = useState(mockKycQueue)
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
-  const [showKycModal, setShowKycModal] = useState(false)
-  const [showDetailModal, setShowDetailModal] = useState(false)
-
-  const selectedUser = selectedUserId ? users.find((u) => u.id === selectedUserId) : null
-
-  // Pagination
-  const {
-    currentPage,
-    pageSize,
-    paginatedItems: paginatedUsers,
-    totalItems,
-    handlePageChange,
-    handlePageSizeChange,
-  } = usePagination(users, {
-    initialPageSize: 10,
-    persistInUrl: true,
-  })
-
-  const handleViewUser = (userId: string) => {
-    setSelectedUserId(userId)
-    setShowDetailModal(true)
+  function changeFilters(next: UserFilters) {
+    setConfirmedIds([]);
+    setFilters(next);
   }
 
-  const handleEditUser = (userId: string) => {
-    console.log('Edit user:', userId)
-    // In production, open edit modal
-  }
-
-  const handleSuspendUser = (userId: string) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === userId
-          ? {
-              ...user,
-              status: user.status === 'suspended' ? 'active' : 'suspended',
-            }
-          : user
-      )
-    )
-    console.log('Toggle suspend user:', userId)
-  }
-
-  const handleDeleteUser = (userId: string) => {
-    if (confirm('Are you sure you want to delete this user?')) {
-      setUsers((prev) => prev.filter((user) => user.id !== userId))
-      console.log('Delete user:', userId)
+  async function refreshUsers() {
+    const result = await users.refetch();
+    if (!result.isError && sameAccount()) {
+      setConfirmedIds([]);
+      setUnconfirmedId(null);
     }
   }
 
-  const handleVerifyKyc = (userId: string) => {
-    setSelectedUserId(userId)
-    setShowKycModal(true)
-  }
-
-  const handleApproveKyc = (userId: string, notes: string) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === userId ? { ...user, kycStatus: 'verified' as const } : user
-      )
+  async function activate(user: AdminUser) {
+    if (
+      busy.current ||
+      disabled ||
+      unconfirmedId ||
+      user.status !== "PENDING" ||
+      !sameAccount()
     )
-    setKycQueue((prev) => prev.filter((item) => item.userId !== userId))
-    console.log('Approve KYC:', { userId, notes })
-  }
-
-  const handleRejectKyc = (userId: string, reason: string) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === userId ? { ...user, kycStatus: 'rejected' as const } : user
-      )
-    )
-    setKycQueue((prev) => prev.filter((item) => item.userId !== userId))
-    console.log('Reject KYC:', { userId, reason })
+      return;
+    busy.current = true;
+    setPendingId(user.id);
+    setNotice(null);
+    try {
+      await activateUser(user.id);
+      if (!sameAccount()) return;
+      setConfirmedIds((ids) => [...ids, user.id]);
+      const name =
+        `${user.firstName} ${user.lastName}`.trim() || user.phoneNumber;
+      setNotice({ text: `Account activated for ${name}.`, error: false });
+      await refreshUsers();
+    } catch (error) {
+      if (!sameAccount()) return;
+      const forbidden = error instanceof APIError && error.status === 403;
+      if (!forbidden) setUnconfirmedId(user.id);
+      setNotice({
+        text: forbidden
+          ? "You do not have permission to activate accounts."
+          : "Activation could not be confirmed. Refresh users to check the account before trying again.",
+        error: true,
+      });
+    } finally {
+      busy.current = false;
+      if (sameAccount()) setPendingId(null);
+    }
   }
 
   return (
     <Container>
-      <div className="space-y-6 pb-20 lg:pb-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <PageHeader title="User Management" description="Manage users and KYC verification" />
-          <Button>
-            <UserPlus className="w-4 h-4 mr-2" />
-            Add User
-          </Button>
-        </div>
-
-        {/* KYC Queue */}
-        <KycQueue submissions={kycQueue} onReview={handleVerifyKyc} />
-
-        {/* User Table */}
-        <UserTable
-          users={paginatedUsers}
-          onViewUser={handleViewUser}
-          onEditUser={handleEditUser}
-          onSuspendUser={handleSuspendUser}
-          onDeleteUser={handleDeleteUser}
+      <div className="space-y-6 py-6 sm:py-8">
+        <PageHeader
+          title="Users"
+          description="Review accounts and help new users get started."
+          actions={
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={disabled}
+              onClick={() => void refreshUsers()}
+            >
+              <RefreshCw
+                className={`mr-2 h-4 w-4 ${users.isFetching ? "animate-spin motion-reduce:animate-none" : ""}`}
+                aria-hidden="true"
+              />
+              {users.isFetching ? "Refreshing…" : "Refresh users"}
+            </Button>
+          }
         />
+        <section
+          aria-labelledby="account-access-title"
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] p-6 text-white sm:p-8"
+        >
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-12 -top-24 h-72 w-72 rounded-full border-[32px] border-white opacity-10"
+          />
+          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-xl">
+              <p className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-white/80">
+                <ShieldCheck className="h-4 w-4" aria-hidden="true" /> Account
+                access
+              </p>
+              <h2
+                id="account-access-title"
+                className="text-2xl font-semibold tracking-tight sm:text-3xl"
+              >
+                A clear start for every user.
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-white/85">
+                Activate pending accounts so users can sign in. Account
+                activation keeps their existing role and identity verification
+                status.
+              </p>
+            </div>
+            <div
+              className="min-w-0 shrink-0 sm:max-w-xs sm:text-right"
+              aria-live="polite"
+            >
+              <p className="text-4xl font-semibold tracking-tight [overflow-wrap:anywhere]">
+                {pagination
+                  ? pagination.total.toLocaleString("en-US")
+                  : users.isPending
+                    ? "…"
+                    : "Unavailable"}
+              </p>
+              <p className="mt-2 text-sm text-white/80">
+                {users.isError && pagination
+                  ? "Last loaded matching accounts"
+                  : filters.status === "PENDING" && !filters.role
+                    ? "Pending accounts"
+                    : "Matching accounts"}
+              </p>
+            </div>
+          </div>
+        </section>
 
-        {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalItems={totalItems}
-          pageSize={pageSize}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          pageSizeOptions={[10, 25, 50]}
-        />
+        {notice ? (
+          <p
+            role={notice.error ? "alert" : "status"}
+            className={`rounded-xl border px-5 py-4 text-sm [overflow-wrap:anywhere] ${notice.error ? "border-amber-300 bg-amber-50 text-amber-950" : "border-[var(--border)] bg-[var(--accent)] text-[var(--primary-dark)]"}`}
+          >
+            {notice.text}
+          </p>
+        ) : null}
+
+        <section
+          aria-labelledby="accounts-title"
+          className="min-w-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]"
+        >
+          <div className="space-y-5 border-b border-[var(--border)] px-5 py-5 sm:px-6">
+            <div>
+              <h2
+                id="accounts-title"
+                className="flex items-center gap-2 font-semibold"
+              >
+                <UsersRound
+                  className="h-4 w-4 text-[var(--primary)]"
+                  aria-hidden="true"
+                />{" "}
+                Account directory
+              </h2>
+              <p className="mt-1 text-sm text-[var(--muted-foreground)]">
+                Newest accounts first. Filter to find the users you need.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:max-w-2xl">
+              <div className="space-y-1.5 text-xs font-medium">
+                <label htmlFor="account-status">Account status</label>
+                <select
+                  id="account-status"
+                  value={filters.status}
+                  disabled={pendingId !== null}
+                  onChange={(event) =>
+                    changeFilters({
+                      ...filters,
+                      status: event.target.value as UserFilters["status"],
+                      page: 1,
+                    })
+                  }
+                  className="block h-11 w-full min-w-0 rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 text-sm focus-visible:outline-2 focus-visible:outline-[var(--primary)] disabled:opacity-50"
+                >
+                  <option value="">All statuses</option>
+                  {Object.entries(userStatuses).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5 text-xs font-medium">
+                <label htmlFor="account-role">Account role</label>
+                <select
+                  id="account-role"
+                  value={filters.role}
+                  disabled={pendingId !== null}
+                  onChange={(event) =>
+                    changeFilters({
+                      ...filters,
+                      role: event.target.value as UserFilters["role"],
+                      page: 1,
+                    })
+                  }
+                  className="block h-11 w-full min-w-0 rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 text-sm focus-visible:outline-2 focus-visible:outline-[var(--primary)] disabled:opacity-50"
+                >
+                  <option value="">All roles</option>
+                  {Object.entries(userRoles).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+          {users.isError ? (
+            <div
+              role="alert"
+              className="m-5 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 sm:mx-6"
+            >
+              {users.data
+                ? "Could not refresh users. Showing the last loaded list. Refresh to check current account statuses."
+                : users.error instanceof APIError && users.error.status === 403
+                  ? "The user directory is not available for this account. Administrator access is required."
+                  : "Users could not be loaded. Use Refresh users to try again."}
+            </div>
+          ) : null}
+          <div aria-busy={users.isFetching}>
+            {users.isPending ? (
+              <div
+                role="status"
+                aria-label="Loading users"
+                className="space-y-6 p-6"
+              >
+                {[0, 1, 2].map((key) => (
+                  <Skeleton key={key} className="h-16 w-full" />
+                ))}
+              </div>
+            ) : users.data?.data.length ? (
+              <AccountList
+                users={users.data.data}
+                pendingId={pendingId}
+                confirmedIds={confirmedIds}
+                unconfirmedId={unconfirmedId}
+                disabled={disabled || users.isError || unconfirmedId !== null}
+                onActivate={(user) => void activate(user)}
+              />
+            ) : users.data ? (
+              <div className="px-6 py-12 text-center">
+                <UsersRound
+                  className="mx-auto mb-3 h-7 w-7 text-[var(--muted-foreground)]"
+                  aria-hidden="true"
+                />
+                <h3 className="font-semibold">
+                  {filters.status === "PENDING" && !filters.role
+                    ? "No accounts awaiting activation"
+                    : "No users match these filters"}
+                </h3>
+                <p className="mt-2 text-sm text-[var(--muted-foreground)]">
+                  {filters.status === "PENDING" && !filters.role
+                    ? "New pending accounts will appear here. Choose All statuses to browse other users."
+                    : "Try another status or role, or refresh the directory."}
+                </p>
+              </div>
+            ) : null}
+          </div>
+          {pagination ? (
+            <nav
+              aria-label="User directory pages"
+              className="flex flex-wrap items-center justify-between gap-4 border-t border-[var(--border)] px-5 py-4 text-xs text-[var(--muted-foreground)] sm:px-6"
+            >
+              <p>
+                {pagination.total === 0
+                  ? "0 accounts"
+                  : `Page ${page.toLocaleString("en-US")} of ${pagination.totalPages.toLocaleString("en-US")} · ${pagination.total.toLocaleString("en-US")} matching accounts`}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  aria-label="Previous user page"
+                  disabled={disabled || users.isError || page <= 1}
+                  onClick={() => changeFilters({ ...filters, page: page - 1 })}
+                >
+                  <ArrowLeft
+                    className="mr-1.5 h-3.5 w-3.5"
+                    aria-hidden="true"
+                  />
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  aria-label="Next user page"
+                  disabled={
+                    disabled || users.isError || page >= pagination.totalPages
+                  }
+                  onClick={() => changeFilters({ ...filters, page: page + 1 })}
+                >
+                  Next
+                  <ArrowRight
+                    className="ml-1.5 h-3.5 w-3.5"
+                    aria-hidden="true"
+                  />
+                </Button>
+              </div>
+            </nav>
+          ) : null}
+        </section>
       </div>
-
-      {/* KYC Verification Modal */}
-      {selectedUser && (
-        <KycVerificationModal
-          isOpen={showKycModal}
-          onClose={() => {
-            setShowKycModal(false)
-            setSelectedUserId(null)
-          }}
-          user={{
-            id: selectedUser.id,
-            name: selectedUser.name,
-            email: selectedUser.email,
-            phone: selectedUser.phone,
-            kycStatus: selectedUser.kycStatus,
-            documents: mockKycDocuments,
-          }}
-          onApprove={handleApproveKyc}
-          onReject={handleRejectKyc}
-        />
-      )}
-
-      {/* User Detail Modal */}
-      {selectedUser && (
-        <UserDetailModal
-          isOpen={showDetailModal}
-          onClose={() => {
-            setShowDetailModal(false)
-            setSelectedUserId(null)
-          }}
-          user={selectedUser}
-          onVerifyKyc={handleVerifyKyc}
-        />
-      )}
     </Container>
-  )
-}
-
-/**
- * usePagination reads the page number from the URL with useSearchParams, which
- * Next.js requires to sit inside a Suspense boundary so the page can be prerendered.
- */
-export default function UsersPage() {
-  return (
-    <Suspense fallback={null}>
-      <UsersPageContent />
-    </Suspense>
   );
 }

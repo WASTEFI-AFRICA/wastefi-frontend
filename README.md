@@ -75,8 +75,13 @@ Wallet balance, history and profile reads use the network without an offline cac
 The profile saves names, email, address and city through `/users/me`. The sign-in
 phone number is read-only. Settings redirects to the profile; notification,
 language, export and account deletion controls are not offered.
+The admin user directory (`/users`) lists real accounts with server pagination,
+status and role filters, and activation for pending accounts. Activation enables
+sign-in without changing roles or KYC status. Role assignment and KYC review
+controls are not offered. User directory reads use the network without an offline
+cache fallback; refresh is manual with no idle polling.
 Other screens, including achievements, collection
-point analytics and inventory, and the admin screens, still render sample data.
+point analytics and inventory, the admin dashboard and fraud detection, still render sample data.
 Each shows a notice saying so.
 
 Photo upload is not connected yet (see the open issues), and submitting needs a
