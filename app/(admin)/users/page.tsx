@@ -12,6 +12,7 @@ import {
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AccountList } from "@/components/admin/AccountList";
+import { PointAssignmentDialog } from "@/components/admin/PointAssignmentDialog";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { APIError } from "@/lib/api/client";
@@ -33,6 +34,7 @@ export default function UsersPage() {
     page: 1,
   });
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [assignmentUser, setAssignmentUser] = useState<AdminUser | null>(null);
   const [confirmedIds, setConfirmedIds] = useState<string[]>([]);
   const [unconfirmedId, setUnconfirmedId] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ text: string; error: boolean } | null>(
@@ -281,6 +283,7 @@ export default function UsersPage() {
                 unconfirmedId={unconfirmedId}
                 disabled={disabled || users.isError || unconfirmedId !== null}
                 onActivate={(user) => void activate(user)}
+                onAssign={setAssignmentUser}
               />
             ) : users.data ? (
               <div className="px-6 py-12 text-center">
@@ -345,6 +348,21 @@ export default function UsersPage() {
           ) : null}
         </section>
       </div>
+      {assignmentUser ? (
+        <PointAssignmentDialog
+          key={assignmentUser.id}
+          user={assignmentUser}
+          onClose={(refresh) => {
+            setAssignmentUser(null);
+            if (refresh) void refreshUsers();
+          }}
+          onSaved={async (text) => {
+            setNotice({ text, error: false });
+            setAssignmentUser(null);
+            await refreshUsers();
+          }}
+        />
+      ) : null}
     </Container>
   );
 }

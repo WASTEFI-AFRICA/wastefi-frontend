@@ -1,11 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Section } from "@/components/layout/Section";
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui";
 import {
   SubmissionQueue,
   VerificationForm,
@@ -23,6 +29,11 @@ import {
 } from "@/lib/api/collections";
 import type { WasteSubmission } from "@/types/api";
 import { MaterialName } from "@/components/collections/MaterialName";
+import { APIError } from "@/lib/api/client";
+import {
+  collectionAccessMessage,
+  type CollectionScope,
+} from "@/lib/api/collection-scope";
 
 /**
  * Verification Page
@@ -34,11 +45,18 @@ import { MaterialName } from "@/components/collections/MaterialName";
 const POLL_MS = 4000;
 
 function errorMessage(error: unknown, fallback: string): string {
-  return error instanceof Error && error.message ? error.message : fallback;
+  return (
+    collectionAccessMessage(error) ??
+    (error instanceof APIError && [403, 404, 409].includes(error.status)
+      ? "This collection is no longer available for review. Refresh the queue to check your access and pending deliveries."
+      : fallback)
+  );
 }
 
 export default function VerificationPage() {
   const [queue, setQueue] = useState<ApiCollection[]>([]);
+  const [scope, setScope] = useState<CollectionScope | null>(null);
+  const scopeRef = useRef<CollectionScope | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [selected, setSelected] = useState<WasteSubmission | null>(null);
@@ -51,15 +69,31 @@ export default function VerificationPage() {
   const fetchQueue = useCallback(
     () =>
       listVerificationQueue()
-        .then((collections) => {
-          setQueue(collections);
+        .then((result) => {
+          if (
+            scopeRef.current?.point?.id !== result.scope.point?.id ||
+            scopeRef.current?.mode !== result.scope.mode
+          )
+            setApproved([]);
+          scopeRef.current = result.scope;
+          setScope(result.scope);
+          setQueue(result.collections);
+          setSelected(null);
+          setSelectedIds([]);
           setLoadError(null);
         })
-        .catch((error) =>
-          setLoadError(errorMessage(error, "Could not load the verification queue."))
-        )
+        .catch((error) => {
+          setQueue([]);
+          setSelected(null);
+          setSelectedIds([]);
+          setApproved([]);
+          setScope(null);
+          setLoadError(
+            errorMessage(error, "Could not load the verification queue."),
+          );
+        })
         .finally(() => setIsLoading(false)),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -81,13 +115,25 @@ export default function VerificationPage() {
     if (!inProgressKey) return;
     const timer = setInterval(async () => {
       const ids = inProgressKey.split(",");
-      const updates = await Promise.allSettled(ids.map((id) => getCollection(id)));
+      const updates = await Promise.allSettled(
+        ids.map((id) => getCollection(id)),
+      );
       setApproved((current) =>
-        current.map((c) => {
-          const index = ids.indexOf(c.id);
-          const update = index >= 0 ? updates[index] : undefined;
-          return update?.status === "fulfilled" ? update.value : c;
-        })
+        current
+          .map((c) => {
+            const index = ids.indexOf(c.id);
+            const update = index >= 0 ? updates[index] : undefined;
+            if (
+              update?.status === "rejected" &&
+              update.reason instanceof APIError &&
+              [403, 404].includes(update.reason.status)
+            )
+              return null;
+            return update?.status === "fulfilled" ? update.value : c;
+          })
+          .filter(
+            (collection): collection is ApiCollection => collection !== null,
+          ),
       );
     }, POLL_MS);
     return () => clearInterval(timer);
@@ -103,7 +149,7 @@ export default function VerificationPage() {
   /** Send one decision. Returns whether it succeeded. */
   const review = async (
     id: string,
-    decision: { approved: boolean; notes?: string; adjustedWeight?: number }
+    decision: { approved: boolean; notes?: string; adjustedWeight?: number },
   ): Promise<boolean> => {
     try {
       const updated = await reviewCollection(id, decision);
@@ -111,20 +157,27 @@ export default function VerificationPage() {
       if (decision.approved) setApproved((current) => [updated, ...current]);
       return true;
     } catch (error) {
-      addToast(errorMessage(error, "The decision could not be saved. Please try again."), "error");
+      addToast(
+        errorMessage(
+          error,
+          "The decision could not be saved. Please try again.",
+        ),
+        "error",
+      );
       return false;
     }
   };
 
   const handleApprove = async (
     submission: WasteSubmission,
-    data: { actualWeight: number; notes?: string }
+    data: { actualWeight: number; notes?: string },
   ) => {
     setIsSubmitting(true);
     const ok = await review(submission.id, {
       approved: true,
       notes: data.notes,
-      adjustedWeight: data.actualWeight !== submission.weight ? data.actualWeight : undefined,
+      adjustedWeight:
+        data.actualWeight !== submission.weight ? data.actualWeight : undefined,
     });
     setIsSubmitting(false);
     if (ok) {
@@ -144,7 +197,12 @@ export default function VerificationPage() {
   };
 
   const handleBulkApprove = async () => {
-    if (!confirm(`Approve ${selectedIds.length} submissions? This cannot be undone.`)) return;
+    if (
+      !confirm(
+        `Approve ${selectedIds.length} submissions? This cannot be undone.`,
+      )
+    )
+      return;
     let done = 0;
     for (const id of [...selectedIds]) {
       if (await review(id, { approved: true })) done += 1;
@@ -153,7 +211,9 @@ export default function VerificationPage() {
   };
 
   const handleBulkReject = async () => {
-    const reason = prompt("Enter rejection reason for all selected submissions:");
+    const reason = prompt(
+      "Enter rejection reason for all selected submissions:",
+    );
     if (!reason) return;
     let done = 0;
     for (const id of [...selectedIds]) {
@@ -169,12 +229,24 @@ export default function VerificationPage() {
           title="Verify Collections"
           description="Review and approve pending submissions"
           actions={
-            <Button variant="outline" size="sm" onClick={reloadQueue} disabled={isLoading}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={reloadQueue}
+              disabled={isLoading}
+            >
               <RefreshCw className="w-4 h-4 mr-2" aria-hidden="true" />
               Refresh
             </Button>
           }
         />
+        {scope ? (
+          <p className="mt-4 inline-block max-w-full rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1.5 text-xs text-[var(--muted-foreground)] [overflow-wrap:anywhere]">
+            {scope.mode === "assigned_point"
+              ? `Assigned point: ${scope.point.name}`
+              : "All collection points"}
+          </p>
+        ) : null}
       </Section>
 
       {approved.length > 0 && (
@@ -183,8 +255,8 @@ export default function VerificationPage() {
             <CardHeader>
               <CardTitle className="text-lg">Approved just now</CardTitle>
               <p className="text-sm text-[var(--muted-foreground)]">
-                Each approval is recorded, verified and paid on Stellar. On testnet this
-                usually takes one to two minutes.
+                Each approval is recorded, verified and paid on Stellar. On
+                testnet this usually takes one to two minutes.
               </p>
             </CardHeader>
             <CardContent className="divide-y divide-[var(--border)] p-0">
@@ -196,7 +268,11 @@ export default function VerificationPage() {
                   <p className="text-sm text-[var(--muted-foreground)]">
                     {collection.weight} kg
                     {collection.collector && (
-                      <> · {collection.collector.firstName} {collection.collector.lastName}</>
+                      <>
+                        {" "}
+                        · {collection.collector.firstName}{" "}
+                        {collection.collector.lastName}
+                      </>
                     )}
                   </p>
                   <ChainProgress collection={collection} />
@@ -221,7 +297,10 @@ export default function VerificationPage() {
           </Card>
         ) : isLoading && queue.length === 0 ? (
           <Card>
-            <CardContent className="p-8 text-center text-[var(--muted-foreground)]" role="status">
+            <CardContent
+              className="p-8 text-center text-[var(--muted-foreground)]"
+              role="status"
+            >
               Loading the verification queue...
             </CardContent>
           </Card>

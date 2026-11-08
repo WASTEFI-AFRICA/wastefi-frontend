@@ -19,7 +19,13 @@ export interface UserFilters {
   role: UserRole | "";
   page: number;
 }
+export interface AssignedPoint {
+  id: string;
+  name: string;
+  isActive: boolean;
+}
 export interface AdminUser {
+  collectionPoint: AssignedPoint | null;
   id: string;
   firstName: string;
   lastName: string;
@@ -82,6 +88,7 @@ async function readPage(
         (!filters.status || user.status === filters.status) &&
         (user.city === null || typeof user.city === "string") &&
         typeof user.country === "string" &&
+        (user.collectionPoint === null || validPoint(user.collectionPoint)) &&
         typeof user.createdAt === "string" &&
         Number.isFinite(Date.parse(user.createdAt)),
     )
@@ -115,4 +122,80 @@ export async function activateUser(userId: string): Promise<void> {
   ) {
     throw new Error("Account activation could not be confirmed");
   }
+}
+
+function validPoint(value: unknown): value is AssignedPoint {
+  if (!value || typeof value !== "object") return false;
+  const point = value as Record<string, unknown>;
+  return (
+    typeof point.id === "string" &&
+    typeof point.name === "string" &&
+    typeof point.isActive === "boolean"
+  );
+}
+
+export async function getAssignablePoints(
+  signal?: AbortSignal,
+): Promise<AssignedPoint[]> {
+  const points: AssignedPoint[] = [];
+  let expectedTotal: number | undefined;
+  for (let page = 1; ; page++) {
+    const body = await api.get<{
+      data: AssignedPoint[];
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+      };
+    }>("/collection-points", { params: { page, limit: 100 }, signal });
+    const meta = body.pagination;
+    if (
+      !meta ||
+      meta.page !== page ||
+      meta.limit !== 100 ||
+      !Number.isSafeInteger(meta.total) ||
+      meta.total < 0 ||
+      meta.totalPages !== Math.ceil(meta.total / 100) ||
+      !Array.isArray(body.data) ||
+      body.data.some((point) => !validPoint(point) || !point.isActive)
+    )
+      throw new Error("Collection points could not be read");
+    expectedTotal ??= meta.total;
+    if (meta.total !== expectedTotal)
+      throw new Error("Collection points changed while loading");
+    points.push(...body.data);
+    if (page >= meta.totalPages) {
+      if (
+        points.length !== expectedTotal ||
+        new Set(points.map((point) => point.id)).size !== points.length
+      )
+        throw new Error("Collection point list is incomplete");
+      return points;
+    }
+    if (body.data.length !== 100)
+      throw new Error("Collection point list is incomplete");
+  }
+}
+
+export async function assignPoint(
+  userId: string,
+  pointId: string | null,
+): Promise<AssignedPoint | null> {
+  const body = await api.put<{
+    success: boolean;
+    data: { id: string; collectionPoint: AssignedPoint | null };
+  }>(`/users/${encodeURIComponent(userId)}/collection-point`, {
+    collectionPointId: pointId,
+  });
+  if (
+    body.success !== true ||
+    body.data?.id !== userId ||
+    (pointId === null
+      ? body.data.collectionPoint !== null
+      : !validPoint(body.data.collectionPoint) ||
+        body.data.collectionPoint.id !== pointId)
+  )
+    throw new Error("Assignment could not be confirmed");
+  return body.data.collectionPoint;
 }

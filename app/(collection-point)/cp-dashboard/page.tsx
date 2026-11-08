@@ -16,6 +16,7 @@ import {
   getReviewQueuePreview,
 } from "@/lib/api/operator-dashboard";
 import { useAuthStore } from "@/store/authStore";
+import { collectionAccessMessage } from "@/lib/api/collection-scope";
 
 const queryOptions = {
   staleTime: 0,
@@ -40,13 +41,63 @@ export default function CollectionPointDashboard() {
     enabled: Boolean(userId),
   });
   const refreshing = statistics.isFetching || queue.isFetching;
+  const scope = queue.data?.scope ?? statistics.data?.scope;
+  const accessError =
+    collectionAccessMessage(statistics.error) ||
+    collectionAccessMessage(queue.error);
+  const scopeMismatch =
+    statistics.data &&
+    queue.data &&
+    (statistics.data.scope.mode !== queue.data.scope.mode ||
+      statistics.data.scope.point?.id !== queue.data.scope.point?.id);
+
+  if (accessError || scopeMismatch)
+    return (
+      <Container>
+        <div className="space-y-6 py-6 sm:py-8">
+          <PageHeader
+            title="Collection dashboard"
+            description="Your collection point activity."
+          />
+          <div
+            role="alert"
+            className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6"
+          >
+            <h2 className="font-semibold">
+              {accessError
+                ? "Collection point access"
+                : "Assignment changed while loading"}
+            </h2>
+            <p className="mt-2 text-sm text-[var(--muted-foreground)]">
+              {accessError ||
+                "Refresh the dashboard to load one consistent collection point."}
+            </p>
+            <Button
+              className="mt-4"
+              variant="outline"
+              disabled={refreshing}
+              onClick={() => {
+                void statistics.refetch();
+                void queue.refetch();
+              }}
+            >
+              {refreshing ? "Refreshing…" : "Refresh dashboard"}
+            </Button>
+          </div>
+        </div>
+      </Container>
+    );
 
   return (
     <Container>
       <div className="space-y-6 py-6 sm:py-8">
         <PageHeader
           title="Collection dashboard"
-          description="Platform activity across all collection points."
+          description={
+            scope?.mode === "assigned_point"
+              ? "Recorded activity and deliveries at your assigned point."
+              : "Recorded activity and deliveries awaiting review."
+          }
           actions={
             <Button
               variant="outline"
@@ -67,9 +118,13 @@ export default function CollectionPointDashboard() {
         />
 
         <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--muted-foreground)]">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1.5">
+          <span className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1.5 [overflow-wrap:anywhere]">
             <Globe2 className="h-3.5 w-3.5" aria-hidden="true" />
-            All collection points
+            {scope?.mode === "assigned_point"
+              ? `Assigned point: ${scope.point.name}`
+              : scope?.mode === "platform"
+                ? "All collection points"
+                : "Scope unavailable"}
           </span>
           <span className="rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1.5">
             All time

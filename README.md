@@ -63,10 +63,10 @@ Connected to the API: sign-in and registration, the collector dashboard, collect
 history and submission (`/dashboard`, `/collections`, `/submit`), collection points
 (`/points`), the wallet (`/wallet`), the profile (`/profile`), the collection point's verification queue
 (`/verify`), the collection point dashboard (`/cp-dashboard`), and the public
-`/stats` page. The dashboard shows all-time recorded totals and materials across
-all collection points, plus the oldest five unreviewed deliveries and the full
-queue count. Records at every review stage contribute to recorded totals.
-Operator-specific access is still pending. Refresh is manual; the dashboard
+`/stats` page. The dashboard shows all-time recorded totals and materials at the operator's
+assigned collection point, plus its oldest five unreviewed deliveries and full
+queue count. Administrators can view platform-wide totals. Records at every review stage contribute to recorded totals.
+Operators without an assigned active point are asked to contact an administrator. Refresh is manual; the dashboard
 does not poll while idle or use an offline API cache fallback.
 The wallet reads the WASTE balance from
 the token contract through the API and loads every collection history page for
@@ -78,7 +78,12 @@ language, export and account deletion controls are not offered.
 The admin user directory (`/users`) lists real accounts with server pagination,
 status and role filters, and activation for pending accounts. Activation enables
 sign-in without changing roles or KYC status. Role assignment and KYC review
-controls are not offered. User directory reads use the network without an offline
+controls are not offered. Administrators can assign, reassign or remove an
+existing operator's collection point. Assignment preserves account status and
+role. Operators see only their assigned active point's deliveries and totals;
+these permissions are enforced by the API with the current database assignment.
+On-chain verification still uses the contract admin until the next MVP change.
+User directory reads use the network without an offline
 cache fallback; refresh is manual with no idle polling.
 Other screens, including achievements, collection
 point analytics and inventory, the admin dashboard and fraud detection, still render sample data.

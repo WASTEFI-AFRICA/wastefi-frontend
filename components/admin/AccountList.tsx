@@ -9,6 +9,7 @@ interface Props {
   unconfirmedId: string | null;
   disabled: boolean;
   onActivate: (user: AdminUser) => void;
+  onAssign: (user: AdminUser) => void;
 }
 
 export function AccountList({
@@ -18,6 +19,7 @@ export function AccountList({
   unconfirmedId,
   disabled,
   onActivate,
+  onAssign,
 }: Props) {
   return (
     <ul aria-label="User accounts" className="divide-y divide-[var(--border)]">
@@ -51,6 +53,24 @@ export function AccountList({
             </div>
             <div className="space-y-1 text-sm [overflow-wrap:anywhere]">
               <p>{userRoles[user.role]}</p>
+              {user.role === "COLLECTION_POINT" ? (
+                <div className="mt-2 space-y-2">
+                  <p className="text-xs text-[var(--muted-foreground)]">
+                    {user.collectionPoint
+                      ? `${user.collectionPoint.name}${user.collectionPoint.isActive ? "" : " (inactive)"}`
+                      : "No collection point assigned"}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={disabled}
+                    aria-label={`Assign collection point for ${name}`}
+                    onClick={() => onAssign(user)}
+                  >
+                    Assign point
+                  </Button>
+                </div>
+              ) : null}
               <p className="text-xs text-[var(--muted-foreground)]">
                 Joined{" "}
                 <time dateTime={user.createdAt}>

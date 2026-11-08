@@ -1,4 +1,5 @@
 import { api } from "./client";
+import { readCollectionScope, type CollectionScope } from "./collection-scope";
 import type { MaterialType, WasteSubmission } from "@/types/api";
 
 /**
@@ -6,7 +7,8 @@ import type { MaterialType, WasteSubmission } from "@/types/api";
  */
 
 /** Progress of an approved collection through the Soroban contracts. */
-export type ChainStatus = "PENDING" | "RECORDED" | "VERIFIED" | "PAID" | "FAILED";
+export type ChainStatus =
+  "PENDING" | "RECORDED" | "VERIFIED" | "PAID" | "FAILED";
 
 /** A collection as the API returns it. */
 export interface ApiCollection {
@@ -42,11 +44,17 @@ export interface CollectionReview {
 }
 
 /** Collections nobody has approved or rejected yet, oldest first. */
-export async function listVerificationQueue(): Promise<ApiCollection[]> {
-  const body = await api.get<{ data: ApiCollection[] }>("/collections", {
-    params: { verified: false, limit: 100 },
-  });
-  return body.data;
+export async function listVerificationQueue(): Promise<{
+  collections: ApiCollection[];
+  scope: CollectionScope;
+}> {
+  const body = await api.get<{ data: ApiCollection[]; scope: unknown }>(
+    "/collections",
+    {
+      params: { verified: false, limit: 100 },
+    },
+  );
+  return { collections: body.data, scope: readCollectionScope(body.scope) };
 }
 
 export async function getCollection(id: string): Promise<ApiCollection> {
@@ -55,8 +63,14 @@ export async function getCollection(id: string): Promise<ApiCollection> {
 }
 
 /** Approve or reject a collection. Approval also starts its on-chain record. */
-export async function reviewCollection(id: string, review: CollectionReview): Promise<ApiCollection> {
-  const body = await api.post<{ data: ApiCollection }>(`/collections/${id}/verify`, review);
+export async function reviewCollection(
+  id: string,
+  review: CollectionReview,
+): Promise<ApiCollection> {
+  const body = await api.post<{ data: ApiCollection }>(
+    `/collections/${id}/verify`,
+    review,
+  );
   return body.data;
 }
 
@@ -76,7 +90,9 @@ const MATERIALS: Record<string, MaterialType> = {
 function photosOf(collection: ApiCollection): string[] {
   try {
     const parsed: unknown = JSON.parse(collection.imageUrls || "[]");
-    return Array.isArray(parsed) ? parsed.filter((url): url is string => typeof url === "string") : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((url): url is string => typeof url === "string")
+      : [];
   } catch {
     return [];
   }
@@ -88,7 +104,8 @@ export function toSubmission(collection: ApiCollection): WasteSubmission {
     id: collection.id,
     collectorId: collection.collectorId,
     collectionPointId: collection.collectionPointId,
-    materialType: MATERIALS[collection.materialCategory.trim().toLowerCase()] ?? "mixed",
+    materialType:
+      MATERIALS[collection.materialCategory.trim().toLowerCase()] ?? "mixed",
     materialDetail: collection.materialType,
     weight: collection.weight,
     photos: photosOf(collection),
@@ -118,14 +135,21 @@ export interface NewCollection {
 }
 
 /** Record a collection for the signed-in collector. It starts waiting for review. */
-export async function submitCollection(collection: NewCollection): Promise<ApiCollection> {
-  const body = await api.post<{ data: ApiCollection }>("/collections", collection);
+export async function submitCollection(
+  collection: NewCollection,
+): Promise<ApiCollection> {
+  const body = await api.post<{ data: ApiCollection }>(
+    "/collections",
+    collection,
+  );
   return body.data;
 }
 
 /** The signed-in collector's own collections, newest first. */
 export async function listMyCollections(limit = 50): Promise<ApiCollection[]> {
-  const body = await api.get<{ data: ApiCollection[] }>("/collections/me", { params: { limit } });
+  const body = await api.get<{ data: ApiCollection[] }>("/collections/me", {
+    params: { limit },
+  });
   return body.data;
 }
 

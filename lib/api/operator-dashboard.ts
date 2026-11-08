@@ -1,5 +1,6 @@
 import { api } from "./client";
 import type { ApiCollection } from "./collections";
+import { readCollectionScope, type CollectionScope } from "./collection-scope";
 
 export interface MaterialStatistic {
   materialType: string;
@@ -9,12 +10,14 @@ export interface MaterialStatistic {
 
 /** Counts and weights include collections at every review stage. */
 export interface CollectionStatistics {
+  scope: CollectionScope;
   totalCollections: number;
   totalWeight: number;
   byMaterial: MaterialStatistic[];
 }
 
 export interface ReviewQueuePreview {
+  scope: CollectionScope;
   collections: ApiCollection[];
   total: number;
 }
@@ -26,10 +29,10 @@ function nonnegative(value: number): boolean {
 export async function getCollectionStatistics(
   signal?: AbortSignal,
 ): Promise<CollectionStatistics> {
-  const { data } = await api.get<{ data: CollectionStatistics }>(
-    "/collections/statistics",
-    { signal },
-  );
+  const { data, scope } = await api.get<{
+    data: CollectionStatistics;
+    scope: unknown;
+  }>("/collections/statistics", { signal });
   if (
     !data ||
     !Number.isSafeInteger(data.totalCollections) ||
@@ -46,7 +49,7 @@ export async function getCollectionStatistics(
   ) {
     throw new Error("Collection statistics could not be read");
   }
-  return data;
+  return { ...data, scope: readCollectionScope(scope) };
 }
 
 /** The oldest five unreviewed records, plus the full queue count from pagination. */
@@ -54,6 +57,7 @@ export async function getReviewQueuePreview(
   signal?: AbortSignal,
 ): Promise<ReviewQueuePreview> {
   const body = await api.get<{
+    scope: unknown;
     data: ApiCollection[];
     pagination: { total: number };
   }>("/collections", {
@@ -77,5 +81,9 @@ export async function getReviewQueuePreview(
   ) {
     throw new Error("The review queue could not be read");
   }
-  return { collections: body.data, total };
+  return {
+    collections: body.data,
+    total,
+    scope: readCollectionScope(body.scope),
+  };
 }
