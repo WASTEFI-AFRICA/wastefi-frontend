@@ -16,7 +16,7 @@ import {
   type PublicStats,
 } from "@/lib/api/public";
 import {
-  CONTRACT_DEPLOYED_ON,
+  CONTRACT_BUNDLE_UPDATED_ON,
   CONTRACT_DEPLOYER,
   CONTRACT_NETWORK,
   DEPLOYED_CONTRACTS,
@@ -246,6 +246,23 @@ export default function PublicStatsPage() {
             come from the API&apos;s record of those transactions; every one can be checked on
             stellar.expert.
           </p>
+          <div className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5 text-sm text-emerald-950">
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">New collection verification</p>
+            <p className="mt-1 font-semibold">
+              {stats?.onChain?.verificationFlow === "point_owner_v1"
+                ? "Signed by the collection point"
+                : stats?.onChain?.verificationFlow === "admin_v1"
+                  ? "Signed by the platform admin"
+                  : stats?.onChain?.verificationFlow === null
+                    ? "On-chain recording is disabled"
+                    : "Waiting for the API to report its verification mode"}
+            </p>
+            <p className="mt-2 leading-relaxed">
+              Wallets are custodial: the API holds the signing keys. The platform controls registry
+              verification and payments, and the contracts retain an admin verification override.
+              Older collections keep their original contracts and verification flow.
+            </p>
+          </div>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
             <StatCard
               loading={loading && !stats}
@@ -387,7 +404,7 @@ export default function PublicStatsPage() {
         <section aria-label="Smart contracts">
           <h2 className="text-xl font-semibold mb-1">Smart contracts on-chain</h2>
           <p className="text-sm text-[var(--muted-foreground)] mb-4">
-            Seven Soroban contracts on {CONTRACT_NETWORK}, deployed {CONTRACT_DEPLOYED_ON} by{" "}
+            Seven Soroban contracts on {CONTRACT_NETWORK}. Bundle updated {CONTRACT_BUNDLE_UPDATED_ON} by{" "}
             <a
               className="text-[var(--primary)] underline"
               href={accountExplorerUrl(CONTRACT_DEPLOYER)}
@@ -398,6 +415,7 @@ export default function PublicStatsPage() {
             </a>
             . Open any of them in the explorer to see the live ledger entries and transactions.
             Testnet, so no real funds; the contracts have not been audited.
+            The token, collector registry, pricing and reputation contracts were retained from the October deployment.
           </p>
           <Card>
             <CardContent className="p-0">
@@ -454,12 +472,14 @@ export default function PublicStatsPage() {
                   </li>
                   <li>
                     Approving a collection records it, verifies it and pays the collector in WASTE
-                    on Stellar testnet, through the seven contracts above
+                    on Stellar testnet. Each collection&apos;s transaction links identify the
+                    contracts used, including older pinned work
                   </li>
                   <li>
                     The collector&apos;s dashboard and history, with the WASTE balance read from the
                     token contract and a link to every transaction
                   </li>
+                  <li>Wallet payment history, profile editing, collection point dashboard totals, and admin account activation and point assignments</li>
                   <li>
                     Automated test suites for the contracts and the backend, run on every push (see the{" "}
                     <a
@@ -478,9 +498,9 @@ export default function PublicStatsPage() {
                 <h3 className="font-semibold text-orange-700 mb-2">Not connected yet</h3>
                 <ul className="list-disc pl-5 space-y-1.5">
                   <li>
-                    Some screens still show <strong>sample data</strong>: the wallet, profile and
-                    achievements, the collection point&apos;s analytics and inventory, and the admin
-                    screens. Each one says so.
+                    Some screens still show <strong>sample data</strong>: achievements, the
+                    collection point&apos;s analytics and inventory, and other admin screens.
+                    Each one says so.
                   </li>
                   <li>Photo upload when submitting a collection</li>
                   <li>Mobile-money cash-out (M-Pesa, MTN, Airtel) and SMS phone verification</li>

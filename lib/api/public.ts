@@ -33,6 +33,8 @@ export interface PublicStats {
   /** Collections recorded and paid on the Soroban contracts. */
   onChain?: {
     network: string;
+    /** New work only; older collections retain their saved verification flow. */
+    verificationFlow?: "admin_v1" | "point_owner_v1" | null;
     explorerUrl: string;
     collectionsPaid: number;
     /** WASTE minted to collectors, in whole tokens. */
