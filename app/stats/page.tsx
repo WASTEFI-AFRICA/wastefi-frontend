@@ -273,6 +273,7 @@ export default function PublicStatsPage() {
               loading={loading && !stats}
               label="WASTE minted to collectors"
               value={stats?.onChain ? number.format(stats.onChain.wasteMinted) : "-"}
+              hint="Counts payouts made through the app only. The token's total supply also includes test mints."
             />
             {wasteToken && (
               <Card className="col-span-2 lg:col-span-1">
