@@ -179,14 +179,6 @@ const queryClient = new QueryClient({
 })
 ```
 
-### IndexedDB Caching
-
-Offline data cached in IndexedDB:
-- Submissions
-- Transactions
-- Collections
-- Sync queue
-
 ## Lazy Loading
 
 ### Component Lazy Loading
@@ -275,7 +267,6 @@ npm run build -- --profile
 
 - [x] Service Worker caching
 - [x] React Query caching
-- [x] IndexedDB for offline
 - [x] Lazy loading images
 - [x] Dynamic imports
 - [x] Request deduplication
@@ -294,8 +285,6 @@ npm run build -- --profile
 - [x] API request caching
 - [x] Request batching
 - [x] Retry logic
-- [x] Offline support
-- [x] Background sync
 
 ## Best Practices
 

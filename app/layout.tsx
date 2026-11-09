@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { QueryProvider } from "@/lib/providers/QueryProvider";
-import { SyncProvider } from "@/components/providers/SyncProvider";
 import { ToastProvider } from "@/components/providers/ToastProvider";
 import { OfflineIndicator } from "@/components/offline/OfflineIndicator";
 import "./globals.css";
@@ -43,11 +42,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <QueryProvider>
-          <SyncProvider>
-            <OfflineIndicator />
-            <ToastProvider />
-            {children}
-          </SyncProvider>
+          <OfflineIndicator />
+          <ToastProvider />
+          {children}
         </QueryProvider>
       </body>
     </html>

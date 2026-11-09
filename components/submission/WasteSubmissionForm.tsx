@@ -7,7 +7,7 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { Camera, MapPin, Scale } from "lucide-react";
 import { Button, Card, CardContent, CardHeader, CardTitle, FormError } from "@/components/ui";
-import { useOnlineStatus } from "@/lib/hooks/useOfflineStorage";
+import { useOnlineStatus } from "@/lib/hooks/useOnlineStatus";
 import { useToast } from "@/lib/hooks/useToast";
 import { submitCollection } from "@/lib/api/collections";
 import {

@@ -6,7 +6,7 @@ WasteFi uses a modern, efficient state management approach optimized for mobile-
 
 - **Zustand**: Lightweight global state management
 - **React Query**: Server state caching and synchronization
-- **Local Storage**: Persistence for authentication and offline support
+- **Local Storage**: Persistence for the authentication session
 
 ## State Management
 
@@ -305,7 +305,6 @@ Create `.env.local` based on `.env.example`:
 
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:3001/api
-NEXT_PUBLIC_ENABLE_OFFLINE_MODE=true
 ```
 
 Access in code:
@@ -329,4 +328,3 @@ Phase 2 will implement:
 - Wallet dashboard with real data
 - Waste submission form
 - Collection point finder
-- Offline queue for submissions

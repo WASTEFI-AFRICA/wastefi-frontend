@@ -33,7 +33,6 @@ Complete guide for deploying WasteFi to production.
 ### Features
 
 - [ ] All routes tested
-- [ ] Offline functionality works
 - [ ] PWA installable on mobile
 - [ ] Service worker registered
 - [ ] Authentication flows tested
@@ -64,7 +63,6 @@ NEXT_PUBLIC_APP_VERSION=1.0.0
 NEXT_PUBLIC_APP_ENV=production
 
 # Feature Flags
-NEXT_PUBLIC_ENABLE_OFFLINE_MODE=true
 NEXT_PUBLIC_ENABLE_ANALYTICS=true
 NEXT_PUBLIC_ENABLE_PUSH_NOTIFICATIONS=true
 
@@ -382,7 +380,6 @@ npm install -g webpack-bundle-analyzer
 - [ ] Test authentication
 - [ ] Test critical user flows
 - [ ] Check responsive design
-- [ ] Test offline functionality
 - [ ] Verify PWA installation
 
 ### 2. Configure CDN

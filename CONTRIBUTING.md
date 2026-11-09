@@ -40,9 +40,8 @@ nothing runs them for you. Please run all three before opening a pull request.
 - All user-facing strings go through `next-intl`, with entries added to all of
   `i18n/messages/en.json`, `sw.json` and `fr.json`. An English-only string is a
   bug.
-- Anything that writes data must work offline: queue it and let
-  `lib/sync/syncManager.ts` replay it. Read
-  [docs/OFFLINE_ARCHITECTURE.md](docs/OFFLINE_ARCHITECTURE.md) first.
+- Writes go straight to the API and need a connection. There is no offline queue,
+  so show a clear message when the request fails instead of pretending it was saved.
 
 ## A note on emoji
 

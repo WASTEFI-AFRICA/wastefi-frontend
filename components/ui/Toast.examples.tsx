@@ -161,12 +161,12 @@ export function ConditionalToastExample() {
 
   const handleSubmission = () => {
     if (isOnline) {
-      toast.success("Submitted and synced!", {
+      toast.success("Submitted.", {
         title: "Success"
       });
     } else {
-      toast.info("Saved offline. Will sync when you're back online.", {
-        title: "Saved Offline"
+      toast.error("You are offline. Connect to the internet to submit.", {
+        title: "No connection"
       });
     }
   };

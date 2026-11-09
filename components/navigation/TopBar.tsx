@@ -3,12 +3,10 @@
 import { Menu, Recycle } from "lucide-react";
 import { Button } from "@/components/ui";
 import { useUIStore } from "@/store/uiStore";
-import { SyncStatusBadge } from "@/components/offline/OfflineIndicator";
-import { useStorageStats } from "@/lib/hooks/useOfflineStorage";
 
 /**
  * Top Bar
- * Header with logo, sync status, and menu toggle
+ * Header with logo and menu toggle
  */
 
 interface TopBarProps {
@@ -18,7 +16,6 @@ interface TopBarProps {
 
 export function TopBar({ title, showMenu = true }: TopBarProps) {
   const toggleSidebar = useUIStore((state) => state.toggleSidebar);
-  const { stats } = useStorageStats();
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--card)] border-b border-[var(--border)]">
@@ -44,10 +41,6 @@ export function TopBar({ title, showMenu = true }: TopBarProps) {
             </span>
           </div>
         </div>
-
-        <SyncStatusBadge
-          pendingCount={stats.pendingSubmissions + stats.syncQueueSize}
-        />
       </div>
     </header>
   );

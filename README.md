@@ -36,8 +36,7 @@ to a minute.
 - Next.js 16 (App Router), React 19, TypeScript
 - TailwindCSS 4
 - Zustand for client state, TanStack Query for server state
-- IndexedDB via `idb` and `localforage` for the offline queue
-- `next-pwa` for the service worker and installability
+- `next-pwa` for the service worker and installability (the app shell can be installed; data is not cached offline)
 - `next-intl` for English, Swahili and French
 - Leaflet for collection point maps
 
@@ -90,20 +89,17 @@ point analytics and inventory, the admin dashboard and fraud detection, still re
 Each shows a notice saying so.
 
 Photo upload is not connected yet (see the open issues), and submitting needs a
-connection: the offline queue described below is not wired to the API.
+connection. The app shows a notice when the browser is offline and the submit form
+asks the user to reconnect.
 
 ## Offline behaviour
 
-The offline path is the part of this app most likely to surprise you, so it is
-worth reading [docs/OFFLINE_ARCHITECTURE.md](docs/OFFLINE_ARCHITECTURE.md)
-before changing anything under `lib/db/` or `lib/sync/`.
-
-The design: writes go to an IndexedDB queue first and are replayed by
-`lib/sync/syncManager.ts` when connectivity returns. That means a submission can
-exist locally but not yet on the server, and the UI has to represent that state
-honestly rather than pretending the write succeeded. The submit form does not use
-the queue yet, because the sync manager still posts to an endpoint the API does not
-have; it asks the user to reconnect instead.
+There is no offline queue. Every write goes straight to the API and needs a
+connection, and reads use the network without an offline cache. An earlier
+IndexedDB queue was never connected to the API (it posted to an endpoint that does
+not exist) and was removed so the screens do not claim a sync that cannot happen.
+If offline submission is added later it needs retries and duplicate protection on
+the server first, so a replayed submission cannot be recorded twice.
 
 ## Local development
 
@@ -147,7 +143,6 @@ valuable contribution available here.
 - [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) — tokens, components and usage
 - [docs/RESPONSIVE_LAYOUT.md](docs/RESPONSIVE_LAYOUT.md) — breakpoints and layout primitives
 - [docs/STATE_MANAGEMENT.md](docs/STATE_MANAGEMENT.md) — what belongs in Zustand vs React Query
-- [docs/OFFLINE_ARCHITECTURE.md](docs/OFFLINE_ARCHITECTURE.md) — the offline queue and sync
 - [docs/INTERNATIONALIZATION.md](docs/INTERNATIONALIZATION.md) — adding strings and locales
 - [docs/PERFORMANCE.md](docs/PERFORMANCE.md) — budgets and measurement
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — building and hosting

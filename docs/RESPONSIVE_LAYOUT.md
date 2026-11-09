@@ -17,7 +17,6 @@ WasteFi implements a mobile-first responsive layout system optimized for various
 
 **Top Bar**
 - Logo and app branding
-- Sync status indicator
 - Notifications bell
 - Menu button (opens sidebar drawer)
 
@@ -40,7 +39,6 @@ WasteFi implements a mobile-first responsive layout system optimized for various
 
 **Top Bar**
 - Logo and title
-- Sync status
 - Notifications
 - No menu button (sidebar always visible)
 
@@ -86,7 +84,6 @@ import { TopBar } from "@/components/navigation/TopBar";
 
 **Features:**
 - Sticky positioning
-- Sync status badge
 - Notification indicator
 - Responsive layout
 
