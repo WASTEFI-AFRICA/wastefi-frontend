@@ -37,7 +37,7 @@ to a minute.
 - TailwindCSS 4
 - Zustand for client state, TanStack Query for server state
 - `next-pwa` for the service worker and installability (the app shell can be installed; data is not cached offline)
-- `next-intl` for English, Swahili and French
+- `next-intl`, installed with English, Swahili and French message files that are not wired into the screens yet (the interface is English only)
 - Leaflet for collection point maps
 
 ## Routes
@@ -103,19 +103,21 @@ the server first, so a replayed submission cannot be recorded twice.
 
 ## Local development
 
-Requires Node.js 18 or later.
+Requires Node.js 20 or later.
 
 ```sh
-cp .env.example .env.local      # then point NEXT_PUBLIC_API_URL at your backend
+cp .env.example .env.local      # points NEXT_PUBLIC_API_URL at a local backend on port 3001
 npm install
 npm run dev
 ```
 
 The app runs at `http://localhost:3000`. It expects the backend at
-`NEXT_PUBLIC_API_URL`; without one reachable, pages that fetch data will show
-their error states. Set `NEXT_PUBLIC_DEMO_PASSWORD` to the backend's
-`DEMO_ACCOUNT_PASSWORD` to show the demo accounts on the sign-in page; both are
-baked in at build time, so a deployment needs a rebuild after changing them.
+`NEXT_PUBLIC_API_URL`; run the backend with `PORT=3001` (see its README). Without one
+reachable, pages that fetch data will show their error states. Set
+`NEXT_PUBLIC_DEMO_PASSWORD` to the backend's `DEMO_ACCOUNT_PASSWORD` to show the demo
+accounts on the sign-in page; both are baked in at build time, so a deployment needs a
+rebuild after changing them. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to pick and
+claim an issue.
 
 ## Checks
 
@@ -125,10 +127,9 @@ npm run type-check      # tsc --noEmit
 npm run build
 ```
 
-There is no automated test suite in this repository yet, and no CI workflow — so
-`npm run lint`, `npm run type-check` and `npm run build` are the only gates, and
-they only run if you run them. Adding tests and a CI workflow is the most
-valuable contribution available here.
+CI runs these three on every pull request, plus MalwareGuard (a check for risky or hidden
+changes) and a dependency review. There is no automated test suite yet; adding one is an
+open `good first issue`.
 
 | Command | Purpose |
 | --- | --- |

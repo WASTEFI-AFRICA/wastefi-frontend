@@ -4,7 +4,7 @@ Thanks for your interest in contributing.
 
 ## Getting set up
 
-Requires Node.js 18 or later.
+Requires Node.js 20 or later (CI uses 22).
 
 ```sh
 cp .env.example .env.local
@@ -12,8 +12,32 @@ npm install
 npm run dev
 ```
 
-You will want the backend running too; see
-[wastefi-backend](https://github.com/WASTEFI-AFRICA/wastefi-backend).
+The app runs at http://localhost:3000. It needs the
+[wastefi-backend](https://github.com/WASTEFI-AFRICA/wastefi-backend) running too. The
+backend README has the steps (a PostgreSQL database and a `.env`). Start the backend with
+`PORT=3001`, which is what `.env.example` points at, so it does not collide with the
+frontend. With `SEED_DEMO_DATA=true` the backend creates a demo collector, a demo
+collection point operator and three collection points, so you can sign in and click through
+the whole flow straight away. If you set `NEXT_PUBLIC_DEMO_PASSWORD` in `.env.local` to the
+backend's `DEMO_ACCOUNT_PASSWORD`, the sign-in page shows one-click demo buttons.
+
+You can see the finished flow without installing anything at
+https://wastefi-frontend.vercel.app. It runs on Stellar testnet, and the
+[stats page](https://wastefi-frontend.vercel.app/stats) says what is live and what is
+still sample data.
+
+## Picking an issue
+
+1. Look for the `good first issue` label. Each issue has a summary, acceptance criteria
+   you can tick off, and suggested commands.
+2. Comment on the issue to say you are taking it. A maintainer assigns it to you. Please
+   take one at a time until your first pull request is merged.
+3. If you stop, say so on the issue so someone else can pick it up. Issues with no
+   activity for two weeks may be reassigned.
+4. Not sure how to start? Ask on the issue. Questions are welcome and get an answer.
+
+Issues without the label are fine to ask about too, but they usually touch more of the
+app or need a decision first.
 
 ## Checks a pull request must pass
 
@@ -23,8 +47,19 @@ npm run type-check
 npm run build
 ```
 
-There is no test suite and no CI workflow yet, so these are the only gates and
-nothing runs them for you. Please run all three before opening a pull request.
+CI runs the same three on every pull request (Node 22, a clean install), so run them
+locally first. Two other checks also run:
+
+- **MalwareGuard** looks at what a pull request changes and blocks the risky patterns that
+  have been spreading through open-source repos: editor tasks that run on open, hidden or
+  obfuscated code, install-time scripts, fonts or binaries that are really scripts, and
+  forged commits. It only reads the diff and never runs your code. If it flags something
+  legitimate, such as a change to `.github/` or a new dependency, say why in the pull
+  request and a maintainer will review it by hand.
+- **Dependency Review** flags vulnerable or unusually licensed new dependencies.
+
+There is no test suite yet. Adding Vitest with a first set of component tests is one of
+the open `good first issue` tasks.
 
 ## Conventions
 
@@ -37,9 +72,10 @@ nothing runs them for you. Please run all three before opening a pull request.
   rather than ad-hoc Tailwind values. See
   [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
 - Build for a phone first. Test at 360px wide before widening.
-- All user-facing strings go through `next-intl`, with entries added to all of
-  `i18n/messages/en.json`, `sw.json` and `fr.json`. An English-only string is a
-  bug.
+- The interface is English only today. `next-intl` is installed and Swahili and French
+  message files exist in `i18n/messages/`, but no screen reads them yet and there is no
+  language switcher. Wiring that up is an open task. Until then, write plain English
+  strings, keep them in one place per component, and do not add keys to the JSON files.
 - Writes go straight to the API and need a connection. There is no offline queue,
   so show a clear message when the request fails instead of pretending it was saved.
 

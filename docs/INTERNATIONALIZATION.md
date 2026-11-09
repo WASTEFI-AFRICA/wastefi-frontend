@@ -1,6 +1,10 @@
 # Internationalization (i18n)
 
-WasteFi supports multiple languages to serve users across different regions.
+> **Status:** the interface is English only today. The message files below exist, but no
+> screen reads them yet, `i18n/request.ts` hard-codes `en`, and there is no language
+> switcher. This page describes the intended setup, not what is wired in.
+
+WasteFi is meant to serve users across different regions in their own language.
 
 ## Supported Languages
 

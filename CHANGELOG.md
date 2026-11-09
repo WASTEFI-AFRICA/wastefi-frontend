@@ -4,6 +4,9 @@ All notable changes to the WasteFi Frontend project.
 
 ## [Unreleased]
 
+### Fixed
+- Docs no longer say the app supports Swahili and French. The interface is English only; the translation files exist but are not wired in yet.
+
 ### Removed
 - **Offline queue**: removed the IndexedDB submission queue, the sync manager and the "Synced" badge. They were never connected to the API (the queue posted to an endpoint that does not exist), so the badge always claimed a sync that could not happen. Submitting needs a connection, and the app shows a notice while the browser is offline.
 

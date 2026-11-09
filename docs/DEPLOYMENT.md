@@ -38,7 +38,6 @@ Complete guide for deploying WasteFi to production.
 - [ ] Authentication flows tested
 - [ ] Payment flows tested
 - [ ] File uploads work
-- [ ] Multi-language support tested
 
 ### Performance
 
