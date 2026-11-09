@@ -35,6 +35,8 @@ export interface PublicStats {
     network: string;
     /** New work only; older collections retain their saved verification flow. */
     verificationFlow?: "admin_v1" | "point_owner_v1" | null;
+    /** How new payouts are created; older APIs omit it. */
+    payoutMode?: "caller_amount_v1" | "derived_v1" | null;
     explorerUrl: string;
     collectionsPaid: number;
     /** WASTE minted to collectors, in whole tokens. */

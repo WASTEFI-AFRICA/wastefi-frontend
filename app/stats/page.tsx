@@ -262,6 +262,20 @@ export default function PublicStatsPage() {
               verification and payments, and the contracts retain an admin verification override.
               Older collections keep their original contracts and verification flow.
             </p>
+            {stats?.onChain?.payoutMode === "derived_v1" && (
+              <p className="mt-2 leading-relaxed">
+                <strong>Payouts are read on-chain.</strong> The payment contract takes the collector
+                and the amount from the verified transaction, so the platform does not choose
+                them. The admin override that can pay another amount stays in the contract, and
+                every use of it is logged as an event.
+              </p>
+            )}
+            {stats?.onChain?.payoutMode === "caller_amount_v1" && (
+              <p className="mt-2 leading-relaxed">
+                <strong>Payout amounts are passed in by the platform.</strong> The payment contract
+                does not yet read them from the verified transaction.
+              </p>
+            )}
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
             <StatCard
