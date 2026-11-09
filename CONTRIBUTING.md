@@ -91,8 +91,8 @@ Open an issue with what you expected, what happened, and the smallest set of
 steps that reproduces it. Include versions and, where relevant, logs or a
 failing test. Search existing issues first.
 
-Do not report security vulnerabilities as issues. Email security@wastefi.org
-instead, or use GitHub's private vulnerability reporting.
+Do not report security vulnerabilities as issues. Use GitHub's private vulnerability
+reporting instead: https://github.com/WASTEFI-AFRICA/wastefi-frontend/security/advisories/new
 
 ## Pull requests
 
@@ -124,6 +124,5 @@ required.
 
 ## Code of conduct
 
-Be straightforward and civil. We follow the
-[Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/);
-report unacceptable behaviour to conduct@wastefi.org.
+Be straightforward and civil. Our [code of conduct](CODE_OF_CONDUCT.md) is adapted from the
+Contributor Covenant and says how to report a problem.
