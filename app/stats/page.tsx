@@ -430,7 +430,8 @@ export default function PublicStatsPage() {
             </a>
             . Open any of them in the explorer to see the live ledger entries and transactions.
             Testnet, so no real funds; the contracts have not been audited.
-            The token, collector registry, pricing and reputation contracts were retained from the October deployment.
+            The token, collector registry, pricing and reputation contracts were retained from the October deployment. The payment contract
+            was replaced on 2026-11-09; collections approved earlier keep the previous one.
           </p>
           <Card>
             <CardContent className="p-0">
