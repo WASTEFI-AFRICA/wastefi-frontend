@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, Recycle } from "lucide-react";
+import { LogOut } from "lucide-react";
+import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
@@ -45,17 +46,10 @@ export function StaffHeader({ area }: { area: keyof typeof NAVIGATION }) {
             aria-label={`WasteFi ${areaName}`}
             className="flex shrink-0 items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--primary)]"
           >
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary)] text-white shadow-sm">
-              <Recycle className="h-6 w-6" aria-hidden="true" />
+            <Logo height={34} decorative />
+            <span className="hidden border-l border-[var(--border)] pl-3 text-xs text-[var(--muted-foreground)] sm:block">
+              {areaName}
             </span>
-            <div>
-              <span className="block text-lg font-bold tracking-tight">
-                WasteFi
-              </span>
-              <span className="hidden text-xs text-[var(--muted-foreground)] sm:block">
-                {areaName}
-              </span>
-            </div>
           </Link>
           <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <div className="flex min-w-0 items-center gap-3">

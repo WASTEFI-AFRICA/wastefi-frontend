@@ -8,6 +8,7 @@ import { Recycle, Coins, ShieldCheck, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Logo } from "@/components/brand/Logo";
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -87,7 +88,8 @@ export function OnboardingSlides() {
       </div>
 
       {/* Slides */}
-      <div className="flex-1 flex items-center justify-center px-6">
+      <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6">
+        <Logo height={36} priority />
         <Swiper
           modules={[Pagination, Navigation]}
           pagination={{ clickable: true }}

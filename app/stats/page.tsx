@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, ExternalLink, Recycle, RefreshCw, XCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ExternalLink, RefreshCw, XCircle } from "lucide-react";
+import { Logo } from "@/components/brand/Logo";
 import { Card, CardContent, CardHeader, CardTitle, Button, Skeleton } from "@/components/ui";
 import {
   API_ORIGIN,
@@ -124,9 +125,8 @@ export default function PublicStatsPage() {
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <header className="bg-[var(--primary)] text-white">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <Recycle className="w-6 h-6" aria-hidden="true" />
-            WasteFi
+          <Link href="/" aria-label="WasteFi home" className="flex items-center">
+            <Logo reversed height={32} decorative />
           </Link>
           <Link href="/login" className="text-sm underline underline-offset-4">
             Sign in

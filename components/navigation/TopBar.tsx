@@ -1,8 +1,9 @@
 "use client";
 
-import { Menu, Recycle } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui";
 import { useUIStore } from "@/store/uiStore";
+import { Logo } from "@/components/brand/Logo";
 
 /**
  * Top Bar
@@ -34,12 +35,14 @@ export function TopBar({ title, showMenu = true }: TopBarProps) {
             </Button>
           )}
           
-          <div className="flex items-center gap-2">
-            <Recycle className="w-6 h-6 text-[var(--primary)]" />
-            <span className="font-semibold text-lg">
-              {title || "WasteFi"}
-            </span>
-          </div>
+          {title ? (
+            <div className="flex items-center gap-2">
+              <Logo variant="mark" height={28} decorative />
+              <span className="font-semibold text-lg">{title}</span>
+            </div>
+          ) : (
+            <Logo height={30} />
+          )}
         </div>
       </div>
     </header>
